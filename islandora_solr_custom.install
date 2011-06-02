@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * Implementation of hook_install
+ */
+ 
+function islandora_solr_custom_install() {
+
+  drupal_install_schema('islandora_solr_custom');
+}
+
+/**
+ * Implementation of hook_uninstall
+ */
+ 
+function islandora_solr_custom_uninstall() {
+
+  drupal_uninstall_schema('islandora_solr_custom');
+}
+
+/**
+ * Implementation of hook_schema
+ * @return the module's DB schema
+ */
+ 
+function islandora_solr_custom_schema() {
+
+$schema['islandora_solr_custom'] = array(
+  'description' => t('saves the order of the solr fields in the search results out'),
+  'fields' => array(
+    'field' => array(
+      'description' => t('solr field name'),
+      'type' => 'varchar',
+      'length' => '256',
+      'not null' => TRUE,
+    ),
+    'label' => array(
+      'description' => t('defaults as the solr field label, but can be overridden'),
+      'type' => 'varchar',
+      'length' => '256',
+      'not null' => TRUE,
+    ),
+    'order' => array(
+      'description' => t('the order of the field'),
+      'type' => 'int',
+      'not null' => TRUE,
+    ),
+  ),
+  'primary key' => array('field'),
+);
+
+return $schema;
+}
