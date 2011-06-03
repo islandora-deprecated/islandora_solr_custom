@@ -10,5 +10,17 @@
  *
  */
 ?>
-<p><?php print t("Your islandora solr search display settings aren't configured yet. Please follow the instructions at the <a href='@admin-page'>Islandora Solr customization page</a>", array('@admin-page' => url('admin/settings/islandora_solr_search/custom') )); ?></p>
+<ul class="islandora_solr_results">
+<?php foreach ($results as $id => $result): ?>
+  <li class="islandora_solr_result">
+  
+    <div class="solr-field <?php print $result['dc.title']['class']; ?>">  
+      <label><?php print t($result['dc.title']['label']); ?></label>
+      <div class="value"><?php print $result['dc.title']['value']; ?></div>
+    </div>
 
+  </li>
+<?php endforeach; ?>
+</ul>
+
+<?php dsm($variables);

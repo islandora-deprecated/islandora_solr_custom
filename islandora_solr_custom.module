@@ -60,6 +60,31 @@ function islandora_solr_custom_help($path, $arg) {
   }
 }
 
+
+/**
+ * Implementation of hook_menu()
+ */
+ 
+function islandora_solr_custom_menu() {
+  $items['admin/settings/islandora_solr_search/config'] = array(
+    'title' => 'Islandora Solr Client',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/settings/islandora_solr_search/custom'] = array(
+    'title' => 'Islandora Solr customization',
+    'description' => 'Customizing Islandora Solr output results',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('islandora_solr_custom_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'islandora_solr_custom.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+
+
+
 /**
  * Implementation of hook_theme()
  */
@@ -70,9 +95,82 @@ function islandora_solr_custom_help($path, $arg) {
        'template' => 'islandora_solr_custom',
        'arguments' => array('results_raw' => NULL, 'extra' => NULL),
      ),
+     'islandora_solr_custom_admin_settings' => array(
+       'arguments' => array('form' => NULL),
+     ),
    );
  
  }
+ 
+ 
+ 
+/**
+ * Theme function for theming the admin table
+ * @return rendered table
+ */
+ 
+function theme_islandora_solr_custom_admin_settings($form) {
+
+  $solrconfig = _islandora_solr_custom_db_values();
+  foreach($solrconfig as $field) {
+  
+    //dsm($field);
+    $fieldname = $field['field'];
+    
+    $form['islandora_solr_custom_table'][$fieldname]['field'] = array(
+      '#type' => 'markup',
+      '#value' => $field['field'],
+    );
+    $form['islandora_solr_custom_table'][$fieldname]['label'] = array(
+      '#type' => 'textfield',
+      '#value' => $field['label'],
+      '#default_value' => $field['field'],
+      '#title' => t('Description'),
+    );
+    $form['islandora_solr_custom_table'][$fieldname]['exclude_label'] = array(
+      '#type' => 'checkbox',
+      '#value' => $field['exclude_label'],
+      '#default_value' => 0,
+    );
+    $form['islandora_solr_custom_table'][$fieldname]['markup'] = array(
+      '#type' => 'checkbox',
+      '#value' => $field['markup'],
+      '#default_value' => 1,
+    );
+  
+  }
+  dsm($_POST);
+
+	$rows = array();
+	foreach ($form['islandora_solr_custom_table'] as $key) {
+  	$row = array();
+  	// check if $key is really the array we need. we shouldn't select the #parent array for example.
+		if (isset($key['field']['#type'])) {
+ 
+			$row[] = array('data' => drupal_render($key['field']));	
+			$row[] = array('data' => drupal_render($key['label']));
+			$row[] = array('data' => drupal_render($key['exclude_label']));
+			$row[] = array('data' => drupal_render($key['markup']));
+ 
+			$rows[] = $row;
+		}
+	}
+  //unset($form['islandora_solr_custom_table']);
+ 
+	// Individual table headers.
+	$header = array();
+	$header[] = t('solr field');
+	$header[] = t('label');
+	$header[] = t('exclude label?');
+	$header[] = t('show markup when empty?');
+  dsm($form);
+	$output = theme('table', $header, $rows);
+	$output .= drupal_render($form);
+  
+  //dsm($output);
+  return $output;
+}
+ 
  
  /**
   * Theme function for theming the solr search results
@@ -85,8 +183,12 @@ function islandora_solr_custom_help($path, $arg) {
   
 function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   global $base_url;
+  // base url
   $variables['base_url'] = $base_url;
-
+  // include solr field order generated from solrconfig.xml
+  $variables['field_order'] = _islandora_solr_custom_solrconfig();
+  
+  
   foreach ($variables['results_raw']->response->docs as $doc) {
       $resultsArray = array();
       foreach ($doc as $field => $value) {
@@ -108,27 +210,6 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
 
 
   }
-}
-
-/**
- * Implementation of hook_menu()
- */
- 
-function islandora_solr_custom_menu() {
-  $items['admin/settings/islandora_solr_search/config'] = array(
-    'title' => 'Islandora Solr Client',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-  );
-  $items['admin/settings/islandora_solr_search/custom'] = array(
-    'title' => 'Islandora Solr customization',
-    'description' => 'Customizing Islandora Solr output results',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('islandora_solr_custom_admin_settings'),
-    'access arguments' => array('administer site configuration'),
-    'file' => 'islandora_solr_custom.admin.inc',
-    'type' => MENU_LOCAL_TASK,
-  );
-  return $items;
 }
 
 
@@ -162,9 +243,9 @@ function _islandora_solr_custom_markup_div($markup) {
 
   // split $markup into arrays
   // $markup = nl2br($markup);
-  $markup = explode("\r\n", $markup);
+  //$markup = explode("\r\n", $markup);
   // $markup = str_replace("\r\n", '', $markup);
-  // dsm($markup);
+   //dsm($markup);
   
   // set $output variable
   $output = '';
@@ -222,38 +303,6 @@ function _islandora_solr_custom_markup_description($pos) {
 }
 
 
-/**
- * Function that connects to solrconfig.xml
- * @return an array that contains all the solr fields that are set in solrconfig.xml in <str name="fl"> ... </str>
- */
- 
-function _islandora_solr_custom_solrconfig() {
-
-  // xpath experiment
-
-  $xmlDoc = new DOMDocument();
-  $xmlFile = 'http://' . variable_get('islandora_solr_search_block_url', 'localhost:8080/solr') . '/admin/file/?file=solrconfig.xml';
-  $xmlDoc->load($xmlFile, LIBXML_NOCDATA);
-  $xpath = new DOMXPath($xmlDoc);
-
-  // xPath query.
-  // variable wich states which requestHandler we're dealing with.
-  $requestHandlerVariable = variable_get('islandora_solr_search_block_request_handler', t('standard'));
-  $query = '//requestHandler[@name="'. $requestHandlerVariable .'"]//str[@name="fl"]';
-
-  $entries = $xpath->query($query);  
-  
-  $result = '';
-  foreach ($entries as $entry) {
-    $result .= "{$entry->nodeValue}";
-  }
-
-  // exploding $result into an array
-  $result = explode(',', $result);
-
-  return $result;
-
-}
 
 
 

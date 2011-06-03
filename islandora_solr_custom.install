@@ -26,28 +26,34 @@ function islandora_solr_custom_uninstall() {
 function islandora_solr_custom_schema() {
 
 $schema['islandora_solr_custom'] = array(
-  'description' => t('saves the order of the solr fields in the search results out'),
+  'description' => t('Solr search results template settings.'),
   'fields' => array(
     'field' => array(
-      'description' => t('solr field name'),
+      'description' => t('The solr field name.'),
       'type' => 'varchar',
       'length' => '256',
       'not null' => TRUE,
     ),
     'label' => array(
-      'description' => t('defaults as the solr field label, but can be overridden'),
+      'description' => t('Optionally overwrite the label for the field.'),
       'type' => 'varchar',
       'length' => '256',
       'not null' => TRUE,
     ),
-    'order' => array(
-      'description' => t('the order of the field'),
+    'exclude_label' => array(
+      'description' => t('Checkbox value: exclude the label from display.'),
+      'type' => 'int',
+      'not null' => TRUE,
+    ),
+    'markup' => array(
+      'description' => t('Checkbox value: show markup even when there is no search result for the field.'),
       'type' => 'int',
       'not null' => TRUE,
     ),
   ),
   'primary key' => array('field'),
 );
+
 
 return $schema;
 }
