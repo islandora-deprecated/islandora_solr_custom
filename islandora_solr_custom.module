@@ -69,6 +69,8 @@ function islandora_solr_custom_menu() {
   $items['admin/settings/islandora_solr_search/config'] = array(
     'title' => 'Islandora Solr Client',
     'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file path' => drupal_get_path('module', 'islandora_solr_search'),
+    'weight' => -1,
   );
   $items['admin/settings/islandora_solr_search/custom'] = array(
     'title' => 'Islandora Solr customization',
@@ -111,36 +113,6 @@ function islandora_solr_custom_menu() {
  
 function theme_islandora_solr_custom_admin_settings($form) {
 
-  $solrconfig = _islandora_solr_custom_db_values();
-  foreach($solrconfig as $field) {
-  
-    //dsm($field);
-    $fieldname = $field['field'];
-    
-    $form['islandora_solr_custom_table'][$fieldname]['field'] = array(
-      '#type' => 'markup',
-      '#value' => $field['field'],
-    );
-    $form['islandora_solr_custom_table'][$fieldname]['label'] = array(
-      '#type' => 'textfield',
-      '#value' => $field['label'],
-      '#default_value' => $field['field'],
-      '#title' => t('Description'),
-    );
-    $form['islandora_solr_custom_table'][$fieldname]['exclude_label'] = array(
-      '#type' => 'checkbox',
-      '#value' => $field['exclude_label'],
-      '#default_value' => 0,
-    );
-    $form['islandora_solr_custom_table'][$fieldname]['markup'] = array(
-      '#type' => 'checkbox',
-      '#value' => $field['markup'],
-      '#default_value' => 1,
-    );
-  
-  }
-  dsm($_POST);
-
 	$rows = array();
 	foreach ($form['islandora_solr_custom_table'] as $key) {
   	$row = array();
@@ -156,6 +128,7 @@ function theme_islandora_solr_custom_admin_settings($form) {
 		}
 	}
   //unset($form['islandora_solr_custom_table']);
+  $form['islandora_solr_custom_table']['#access'] = FALSE; // don't unset $form['anything'] , use $form['anything']['#access'] = FALSE; instead!
  
 	// Individual table headers.
 	$header = array();
@@ -163,13 +136,17 @@ function theme_islandora_solr_custom_admin_settings($form) {
 	$header[] = t('label');
 	$header[] = t('exclude label?');
 	$header[] = t('show markup when empty?');
-  dsm($form);
-	$output = theme('table', $header, $rows);
+  //dsm($form);
+  $output = '';
+  //$output = drupal_render($form['style']);  // render the dropdown before the table. Not sure if I want to keep this.
+	$output .= theme('table', $header, $rows);
 	$output .= drupal_render($form);
   
   //dsm($output);
   return $output;
 }
+ 
+ 
  
  
  /**
@@ -186,9 +163,12 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   // base url
   $variables['base_url'] = $base_url;
   // include solr field order generated from solrconfig.xml
-  $variables['field_order'] = _islandora_solr_custom_solrconfig();
+  $variables['field_order'] = _islandora_solr_custom_solrconfig(); // not sure if this is really needed, but I'll keep it in for now.
+  $variables['field_values'] = _islandora_solr_custom_db_values(); // this variable might be more useful as the db values are parsed in the solrconfig order using the results of _islandora_solr_custom_solrconfig().
+  $variables['style'] = variable_get('islandora_solr_custom_style','div');
+  $variables['css'] = variable_get('islandora_solr_custom_css', 1);
   
-  
+  dsm($variables);
   foreach ($variables['results_raw']->response->docs as $doc) {
       $resultsArray = array();
       foreach ($doc as $field => $value) {
@@ -204,13 +184,10 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
 
   // dsm($resultsArray);
   $variables['results'][] = $resultsArray;
-
-
-
-
-
   }
 }
+
+
 
 
 

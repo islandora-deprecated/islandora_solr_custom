@@ -17,13 +17,68 @@ function islandora_solr_custom_admin_settings() {
     '#description' => t('Fill out the solr fields you want to display in the search results. One field name per line.'),
   );
   */
-  //dsm(_islandora_solr_custom_db_values());
-
-  //dsm($form);
+  $form['style'] = array(
+    '#type' => 'select',
+    '#title' => t('Display style'),
+    '#default_value' => variable_get('islandora_solr_custom_style','div'),
+    '#options' => array(
+      'div' => t('Div'),
+      'table' => t('Table'),
+    ),
+    '#description' => t('Set the style of the solr search results.'),
+    '#weight' => -10,
+  );
+  $form['css'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Include css?'),
+    '#default_value' => variable_get('islandora_solr_custom_css', 1),
+    '#description' => t('Check if you want to include some basic css styling. You can still overwrite css in the theme layer. Only uncheck if you really want to take full control over the css styling.'),
+  );
   
   
+  $form['islandora_solr_custom_table'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Field settings'), // doesn't work with table render.
+    '#collapsible' => FALSE, // doesn't work with table render.
+    '#collapsed' => FALSE,
+    '#tree' => TRUE, // this attribute is important to return the submitted values in a deeper nested arrays in $form_state['values'] . See http://drupal.org/node/751826
+    '#description' => t('description'), // doesn't work with table render.
+    '#weight' => -1,
+  );
   
+  $solrconfig = _islandora_solr_custom_db_values();
+  foreach($solrconfig as $field) {
   
+    //dsm($field);
+    $fieldname = $field['field'];
+    
+    $form['islandora_solr_custom_table'][$fieldname]['field'] = array(
+      '#type' => 'markup',
+      '#value' => $field['field'],
+      '#weight' => -1,
+    );
+    $form['islandora_solr_custom_table'][$fieldname]['hidden'] = array(
+      '#type' => 'hidden',
+      '#value' => $field['field'],  // to know which row in the DB to update with the new values on save.
+      '#weight' => -1,
+    );
+    $form['islandora_solr_custom_table'][$fieldname]['label'] = array(
+      '#type' => 'textfield',
+      '#default_value' => $field['label'],
+      '#weight' => -1,
+    );
+    $form['islandora_solr_custom_table'][$fieldname]['exclude_label'] = array(
+      '#type' => 'checkbox',
+      '#default_value' => $field['exclude_label'],
+      '#weight' => -1,
+    );
+    $form['islandora_solr_custom_table'][$fieldname]['markup'] = array(
+      '#type' => 'checkbox',
+      '#default_value' => $field['markup'],
+      '#weight' => -1,
+    );
+  
+  }
   
   $form['buttons']['submit'] = array(
     '#type' => 'submit',
@@ -50,11 +105,25 @@ function islandora_solr_custom_admin_settings() {
   );
   
   $form['#submit'][] = 'islandora_solr_custom_settings_form_submit';
+  //$form['#validate'][] = 'islandora_solr_custom_settings_form_validate';
+  $form['#theme'] = 'islandora_solr_custom_admin_settings';
   //$form['#theme'] = 'system_settings_form';
   
-  
-  return ($form);
+  return $form;
 }
+
+function islandora_solr_custom_admin_settings_validate($element, &$form_state) {
+      
+      //dsm($element);
+      //dsm($form_state);
+      
+      // I should add some validation rules here.
+      
+      //if (empty($element['#value'])) {
+      //     form_error($element['#name'], t('This field is required.'));
+      //   }
+}
+
 
 
 /**
@@ -67,6 +136,35 @@ function islandora_solr_custom_admin_settings() {
 function islandora_solr_custom_settings_form_submit($form, &$form_state) {
 
   dsm($form_state);
+  
+  // saving the table results
+  $table_results = $form_state['values']['islandora_solr_custom_table'];
+  foreach($table_results as $result) {
+  
+    //dsm($result);
+    db_query("UPDATE {islandora_solr_custom} SET label = '%s', exclude_label = %d, markup = %d WHERE field = '%s'", $result['label'], $result['exclude_label'], $result['markup'], $result['hidden']);
+    // I should try to use this, but it doesn't work yet.
+    // drupal_write_record("islandora_solr_custom, &$field, $update = array());
+  }
+  
+  // saving the style result
+  variable_set('islandora_solr_custom_style', $form_state['values']['style']);
+  
+  // saving the css result
+  variable_set('islandora_solr_custom_css', $form_state['values']['css']);
+  
+  
+  
+  
+  
+  // I should check all that comes after this. And write a function to reset the values.
+  
+  
+  
+  if ($form_state['clicked_button']['#id'] != 'edit-submit') {
+    $form_state['rebuild'] = TRUE;
+    return;
+  }
   $op = isset($form_state['values']['op']) ? $form_state['values']['op'] : '';
 
   // Exclude unnecessary elements.
@@ -124,7 +222,7 @@ function _islandora_solr_custom_db_values() {
   
   //dsm($item);
   
-  
+
   
   
 	// if the DB table is empty, then fill it with information fetched from solrconfig.xml
@@ -164,8 +262,17 @@ function _islandora_solr_custom_db_values() {
  
 function _islandora_solr_custom_solrconfig() {
 
-  // xpath experiment
+  // if $debug is set to TRUE, then it just makes a quick dummy result array instead of looking for solrconfig.xml.
+  $debug = TRUE;
+  
+  // setup a variable for debugging. I probably should remove this stuff later.
+  if($debug == TRUE) {
+  
+    $result = array('dc.title', 'dc.foo1');
+  
+  } else {
 
+  // xpath experiment
   $xmlDoc = new DOMDocument();
   $xmlFile = 'http://' . variable_get('islandora_solr_search_block_url', 'localhost:8080/solr') . '/admin/file/?file=solrconfig.xml';
   $xmlDoc->load($xmlFile, LIBXML_NOCDATA);
@@ -176,7 +283,7 @@ function _islandora_solr_custom_solrconfig() {
   $requestHandlerVariable = variable_get('islandora_solr_search_block_request_handler', t('standard'));
   $query = '//requestHandler[@name="'. $requestHandlerVariable .'"]//str[@name="fl"]';
 
-  $entries = $xpath->query($query);  
+  $entries = $xpath->query($query);
   
   $result = '';
   foreach ($entries as $entry) {
@@ -192,9 +299,9 @@ function _islandora_solr_custom_solrconfig() {
   // exploding $result into an array
   if($result != FALSE) $result = explode(',', $result);
   
+  }
+  
   return $result;
 
 }
-
-
 
