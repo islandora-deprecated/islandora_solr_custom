@@ -34,6 +34,8 @@ function islandora_solr_custom_admin_settings() {
     '#default_value' => variable_get('islandora_solr_custom_css', 1),
     '#description' => t('Check if you want to include some basic css styling. You can still overwrite css in the theme layer. Only uncheck if you really want to take full control over the css styling.'),
   );
+
+  
   
   
   $form['islandora_solr_custom_table'] = array(
@@ -62,6 +64,14 @@ function islandora_solr_custom_admin_settings() {
       '#value' => $field['field'],  // to know which row in the DB to update with the new values on save.
       '#weight' => -1,
     );
+    // if the row is just added.
+    if (isset($field['new'])) {
+    $form['islandora_solr_custom_table'][$fieldname]['new'] = array(
+      '#type' => 'hidden',
+      '#value' => $field['new'],  // to know if this row is added in the same POST request as the _submit request. We don't update the DB then. It would override the default settings with empty values.
+      '#weight' => -1,
+    );
+    }
     $form['islandora_solr_custom_table'][$fieldname]['label'] = array(
       '#type' => 'textfield',
       '#default_value' => $field['label'],
@@ -135,16 +145,30 @@ function islandora_solr_custom_admin_settings_validate($element, &$form_state) {
  
 function islandora_solr_custom_settings_form_submit($form, &$form_state) {
 
-  dsm($form_state);
+  //dsm($form_state);
+  
+ //This selects all rows in the order of the database:
+  $sql = "SELECT * FROM {islandora_solr_custom}";
+	$res = db_query($sql);
+  while($db_array = db_fetch_array($res)) {
+    $item[] = $db_array;
+  }
+  //dsm($item);  
   
   // saving the table results
+  // saving only the results of fields that are already in the DB to prevent saving empty values.
   $table_results = $form_state['values']['islandora_solr_custom_table'];
   foreach($table_results as $result) {
   
-    //dsm($result);
-    db_query("UPDATE {islandora_solr_custom} SET label = '%s', exclude_label = %d, markup = %d WHERE field = '%s'", $result['label'], $result['exclude_label'], $result['markup'], $result['hidden']);
+    $field = $result['hidden'];
+   // $new = $result['new'];
+  
+    if (!isset($result['new'])) {
+
+      db_query("UPDATE {islandora_solr_custom} SET label = '%s', exclude_label = %d, markup = %d WHERE field = '%s'", $result['label'], $result['exclude_label'], $result['markup'], $result['hidden']);
     // I should try to use this, but it doesn't work yet.
     // drupal_write_record("islandora_solr_custom, &$field, $update = array());
+    }
   }
   
   // saving the style result
@@ -194,6 +218,10 @@ function islandora_solr_custom_settings_form_submit($form, &$form_state) {
 
 
 
+
+
+
+
 /**
  * Function that returns the DB input and saves new data if the table is empty.
  * It will also output the database values in the order of the values in solrconfig.xml.
@@ -210,45 +238,53 @@ function _islandora_solr_custom_db_values() {
 //    $item[] = $db_array;
 //  }
   
+ 
+  
+  // check if the DB table is empty or not
+  $count = db_query("SELECT count(*) FROM {islandora_solr_custom}");
+  $count_result = db_result($count);
+  
   // retrieve all information from the DB table and output them in the order as defined in solrconfig.xml
   $item = array();
   $solrconfig = _islandora_solr_custom_solrconfig();
   foreach($solrconfig as $field) {
     $sql = "SELECT * FROM {islandora_solr_custom} WHERE field = '$field'";
     $res = db_query($sql);
-    $item[] = db_fetch_array($res);
-  
-  }
-  
-  //dsm($item);
-  
-
-  
-  
-	// if the DB table is empty, then fill it with information fetched from solrconfig.xml
-	// if it can't connect to solrconfig.xml, output a notification.
-	if (!$item) {
-	
-	  $solrconfig = _islandora_solr_custom_solrconfig();
-	  //dsm($solrconfig);
-	  
-	  foreach($solrconfig as $field) {
+    $row_result = db_fetch_array($res);
+    
+    // if the field is not in the DB, add it using default settings and fetch it again.
+    if(!is_array($row_result)) {
+      // add it to the DB
       db_query("INSERT INTO {islandora_solr_custom} (field, label, exclude_label, markup) VALUES('%s', '%s', %d, %d)", $field, $field, 0, 1);
-      // I should try to use this, but it doesn't work yet.
-      // drupal_write_record("islandora_solr_custom, &$field, $update = array());
-    }
-	  
-	  // retrieve all information from the DB table and output them in the order as defined in solrconfig.xml
-    $item = array();
-    $solrconfig = _islandora_solr_custom_solrconfig();
-    foreach($solrconfig as $field) {
+      // and fetch it again
       $sql = "SELECT * FROM {islandora_solr_custom} WHERE field = '$field'";
       $res = db_query($sql);
-      $item[] = db_fetch_array($res);
+      $row_result = db_fetch_array($res);
+      $row_result['new'] = TRUE; // if the row just got added now, add a 'new' value. This will be put in a hidden field. This is needed so when saving table results while there are new fields added, the results will be saved, but no values would be set yet. This would override the default values set in this function with empty values.
     }
-	 
-	}
-	
+
+    $item[] = $row_result;
+    
+  }
+   
+  // clean up rows that are not in the $solrconfig results
+  $sql = "SELECT * FROM {islandora_solr_custom}";
+	$res = db_query($sql);
+  while($db_array = db_fetch_array($res)) {
+    if(!in_array($db_array['field'], $solrconfig)) {
+    
+      $field = $db_array['field'];
+      $sql = "DELETE FROM {islandora_solr_custom} WHERE field = '$field'";
+      db_query($sql);
+      drupal_set_message( t("@field is not defined in solrconfig.xml and is removed.", array('@field' => $field)) );
+    
+    }
+    //dsm($db_array);
+  }
+   
+   
+  
+  //dsm($item);
 	
   return $item;
 }
@@ -263,12 +299,12 @@ function _islandora_solr_custom_db_values() {
 function _islandora_solr_custom_solrconfig() {
 
   // if $debug is set to TRUE, then it just makes a quick dummy result array instead of looking for solrconfig.xml.
-  $debug = TRUE;
+  $debug = FALSE;
   
   // setup a variable for debugging. I probably should remove this stuff later.
   if($debug == TRUE) {
   
-    $result = array('dc.title', 'dc.foo1');
+    $result = array('dc.title', 'dc.foo1', 'dc.foo2', 'dc.foo3');
   
   } else {
 

@@ -17,6 +17,8 @@ function islandora_solr_custom_init() {
   // adds css. I should look for an alternative place to load this because hook_init() will load this on every page.
   drupal_add_css(drupal_get_path('module', 'islandora_solr_custom') .'/css/islandora_solr_custom.css');
 
+  // add the .inc file
+  module_load_include('inc', 'islandora_solr_custom', 'islandora_solr_custom.admin');
 }
 
 /**
@@ -164,25 +166,39 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   $variables['base_url'] = $base_url;
   // include solr field order generated from solrconfig.xml
   $variables['field_order'] = _islandora_solr_custom_solrconfig(); // not sure if this is really needed, but I'll keep it in for now.
-  $variables['field_values'] = _islandora_solr_custom_db_values(); // this variable might be more useful as the db values are parsed in the solrconfig order using the results of _islandora_solr_custom_solrconfig().
+  $variables['db_values'] = _islandora_solr_custom_db_values(); // this variable might be more useful as the db values are parsed in the solrconfig order using the results of _islandora_solr_custom_solrconfig().
+  $db_values = $variables['db_values'];
   $variables['style'] = variable_get('islandora_solr_custom_style','div');
   $variables['css'] = variable_get('islandora_solr_custom_css', 1);
   
-  dsm($variables);
+  //dsm($variables);
+  
   foreach ($variables['results_raw']->response->docs as $doc) {
-      $resultsArray = array();
-      foreach ($doc as $field => $value) {
-
-        if (is_array($value)) {
-          $value = implode(", ", $value);
-        }
-        $resultsArray[$field]['value'] = $value;
-        $resultsArray[$field]['label'] = $field;
-        // turn the field name in a string that is appropriate to use as a class name.
-        $resultsArray[$field]['class'] = strtolower( preg_replace('/[^A-Za-z0-9]/', '-', $field) );
-      }
+  
+    $resultsArray = array();
+    $zebra = 'odd';
+    foreach($db_values as $db_value) {
+      
+      //dsm($db_value['field']);
+      $value = $doc->$db_value['field'];
+      $field = $db_value['field'];
+      
+          if (is_array($value)) {
+            $value = implode(", ", $value);
+          }
+          $resultsArray[$field]['value'] = $value;  
+          $resultsArray[$field]['label'] = $db_value['label'];
+          $resultsArray[$field]['class'] = strtolower( preg_replace('/[^A-Za-z0-9]/', '-', $db_value['field']) ); // turn the field name in a string that is appropriate to use as a class name.
+          $resultsArray[$field]['exclude_label'] = $db_value['exclude_label'];
+          $resultsArray[$field]['markup'] = $db_value['markup'];
+          $resultsArray[$field]['zebra'] = $zebra;
+          $zebra = ($zebra == 'odd' ? 'even' : 'odd'); 
+     
+    }
 
   // dsm($resultsArray);
+  
+  
   $variables['results'][] = $resultsArray;
   }
 }

@@ -13,12 +13,25 @@
 <ul class="islandora_solr_results">
 <?php foreach ($results as $id => $result): ?>
   <li class="islandora_solr_result">
-  
-    <div class="solr-field <?php print $result['dc.title']['class']; ?>">  
-      <label><?php print t($result['dc.title']['label']); ?></label>
-      <div class="value"><?php print $result['dc.title']['value']; ?></div>
-    </div>
-
+  <?php foreach ($result as $field => $values): ?> 
+    <?php 
+      $value = $values['value'];
+      $label = $values['label'];
+      $class = $values['class'];
+      $exclude_label = $values['exclude_label'];
+      $markup = $values['markup'];
+      $zebra = $values['zebra'];
+    ?>
+    <?php if($markup == 1): ?>
+      <div class="solr-field <?php print $class.' '.$zebra ?>">  
+        <?php if($exclude_label == 0): ?>
+          <label><?php print t($label); ?></label>
+        <?php endif; ?>
+        <div class="value"><?php print $value; ?></div>
+      </div>
+    <?php endif; ?>
+    
+  <?php endforeach; ?>
   </li>
 <?php endforeach; ?>
 </ul>
