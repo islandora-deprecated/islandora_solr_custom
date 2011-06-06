@@ -97,7 +97,7 @@ function islandora_solr_custom_menu() {
    return array(
      'islandora_solr_custom' => array(
        'template' => 'islandora_solr_custom',
-       'arguments' => array('results_raw' => NULL, 'extra' => NULL),
+       'arguments' => array('results_raw' => NULL),
      ),
      'islandora_solr_custom_admin_settings' => array(
        'arguments' => array('form' => NULL),
@@ -161,8 +161,8 @@ function theme_islandora_solr_custom_admin_settings($form) {
   */
   
 function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
-  global $base_url;
   // base url
+  global $base_url;
   $variables['base_url'] = $base_url;
   // include solr field order generated from solrconfig.xml
   $variables['field_order'] = _islandora_solr_custom_solrconfig(); // not sure if this is really needed, but I'll keep it in for now.
@@ -173,10 +173,12 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   
   //dsm($variables);
   
+  // go over each search result object
   foreach ($variables['results_raw']->response->docs as $doc) {
   
     $resultsArray = array();
     $zebra = 'odd';
+    // go over each field within a search result object
     foreach($db_values as $db_value) {
       
       //dsm($db_value['field']);
@@ -186,6 +188,7 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
           if (is_array($value)) {
             $value = implode(", ", $value);
           }
+          // set the fields
           $resultsArray[$field]['value'] = $value;  
           $resultsArray[$field]['label'] = $db_value['label'];
           $resultsArray[$field]['class'] = strtolower( preg_replace('/[^A-Za-z0-9]/', '-', $db_value['field']) ); // turn the field name in a string that is appropriate to use as a class name.
@@ -197,8 +200,6 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
     }
 
   // dsm($resultsArray);
-  
-  
   $variables['results'][] = $resultsArray;
   }
 }

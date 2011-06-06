@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * Function to set debug options. It provides dummy search results and dummy solrconfig.xml field results.
+ * @return change this to TRUE or FALSE whether you want to use sample data or actual solr data.
+ */
+
+function _islandora_solr_custom_debug() {
+
+  $debug_mode = TRUE;
+
+  return $debug_mode;
+}
+
 
 /**
  * Function to return admin setting form
@@ -299,7 +311,7 @@ function _islandora_solr_custom_db_values() {
 function _islandora_solr_custom_solrconfig() {
 
   // if $debug is set to TRUE, then it just makes a quick dummy result array instead of looking for solrconfig.xml.
-  $debug = FALSE;
+  $debug = _islandora_solr_custom_debug();
   
   // setup a variable for debugging. I probably should remove this stuff later.
   if($debug == TRUE) {

@@ -48,9 +48,9 @@ class IslandoraSolrResultsCustom extends IslandoraSolrResults {
       $output .= theme('fieldset', $fieldset_r);
     }
 
-    $extra = 'extra-test';
+    
     $results_raw = $results;
-    $output = theme('islandora_solr_custom', $results_raw, $extra);
+    $output = theme('islandora_solr_custom', $results_raw);
     
     return $output;
   }
