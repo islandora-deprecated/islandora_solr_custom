@@ -7,7 +7,7 @@
 
 function _islandora_solr_custom_debug() {
 
-  $debug_mode = TRUE;
+  $debug_mode = FALSE;
 
   return $debug_mode;
 }
