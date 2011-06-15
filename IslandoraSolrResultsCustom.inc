@@ -16,8 +16,9 @@ class IslandoraSolrResultsCustom extends IslandoraSolrResults {
   static $facetSeparator = '~';//used to separate facets in url
   static $slashReplacement = '~slsh~';// a pattern used to replace / in url's the slash breaks drupal clean url's
   public static $SEARCH_CLASS_ADVANCED_SEARCH_NUMBER_FIELDS = 5;
-  function IslandoraSolrResults() {
-    module_load_include('php', 'islandora_solr_search', 'Solr/Service');
+  function IslandoraSolrResultsCustom() {
+    parent::__construct();
+    //module_load_include('php', 'islandora_solr_search', 'Solr/Service');
   }
 
   /**
@@ -35,9 +36,9 @@ class IslandoraSolrResultsCustom extends IslandoraSolrResults {
    *   html output for the resultset. Note: we currently create this 
    *   output manually, should refactor to use drupal forms api.
    */
-  function displayResults($results){
-  
-    if( variable_get('islandora_solr_search_debug_mode', 0) ) { // debug dump
+  function printResults($results) {
+ 
+    if ( variable_get('islandora_solr_search_debug_mode', 0) ) { // debug dump
       $results_r .= "<pre>Results: ".print_r($results,true)."</pre>";
       $fieldset_r = array(
         '#title' => t("Raw Results"),                                                                                                                                             
@@ -48,7 +49,6 @@ class IslandoraSolrResultsCustom extends IslandoraSolrResults {
       $output .= theme('fieldset', $fieldset_r);
     }
 
-    
     $results_raw = $results;
     $output = theme('islandora_solr_custom', $results_raw);
     

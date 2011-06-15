@@ -21,22 +21,32 @@ function islandora_solr_custom_init() {
   module_load_include('inc', 'islandora_solr_custom', 'islandora_solr_custom.admin');
 }
 
-/**
- * Implementation of hook_alter_form.
- * Adds this module's configuration options to islandora_solr_search's configuration page.
- */
 
-function islandora_solr_custom_form_islandora_solr_admin_settings_alter(&$form, &$form_state) {
-  $module   = 'islandora_solr_custom';
-  $file     = 'IslandoraSolrResultsCustom.inc';
-  $class    = 'IslandoraSolrResultsCustom';
-  $method   = 'displayResults';
-  $config_options = $form['islandora_solr_config_options']['#options'];
-  $config_options["${module}~${file}~${class}~${method}"] = 'Custom';
-  $form['islandora_solr_config_options']['#options'] = $config_options;
-  
-  // dsm($form);
+
+/**
+ * Implements hook_islandora_solr_primary_display()
+ */
+function islandora_solr_custom_islandora_solr_primary_display() {
+  return array(
+    // 'machine-name' = array(
+    //   'name' => 'Human Readable Name',
+    //   'module' => 'module_name',
+    //   'file' => 'FileName.inc',
+    //   'class' => 'ClassName',
+    //   'function' => 'function_name',
+    //   'description' => 'A description of the display profile',
+    // );
+    'custom' => array(
+      'name' => t('Custom'),
+      'module' => 'islandora_solr_custom',
+      'file' => 'IslandoraSolrResultsCustom.inc',
+      'class' => "IslandoraSolrResultsCustom",
+      'function' => "displayResults",
+      'description' => t("Take full controll over the markup of the Solr results."),
+    ),
+  );
 }
+
 
 
 /**
@@ -171,7 +181,12 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   $variables['style'] = variable_get('islandora_solr_custom_style','div');
   $variables['css'] = variable_get('islandora_solr_custom_css', 1);
   
-  //dsm($variables);
+  // include css or not
+  $css = variable_get('islandora_solr_custom_css', 1);
+  if ($css == 1) {
+    drupal_add_css(drupal_get_path('module', 'islandora_solr_custom') .'/css/islandora_solr_custom_tpl.css');
+  }
+  
   
   // go over each search result object
   foreach ($variables['results_raw']->response->docs as $doc) {

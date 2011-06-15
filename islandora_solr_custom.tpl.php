@@ -25,7 +25,9 @@
     <?php if($markup == 1): ?>
       <div class="solr-field <?php print $class.' '.$zebra ?>">  
         <?php if($exclude_label == 0): ?>
-          <label><?php print t($label); ?></label>
+          <div class="label">
+            <label><?php print t($label); ?></label>
+          </div>
         <?php endif; ?>
         <div class="value"><?php print $value; ?></div>
       </div>

@@ -1,0 +1,44 @@
+/* css markup for template */
+
+
+.islandora_solr_result
+{
+  float: left;
+  margin-bottom: 25px;
+}
+
+.islandora_solr_result .label
+{
+  float: left;
+  /* width: 50%; */
+  padding: 0px 0px 0px 10px;
+}
+.islandora_solr_result label
+{
+  font-weight: bold;
+}
+.islandora_solr_result .value
+{
+  float: right;
+  width: 50%;
+  padding: 0px 0px;
+}
+.islandora_solr_result .odd
+{
+  background-color: #efefef;
+}
+.islandora_solr_result .odd,
+.islandora_solr_result .even
+{
+    border-top: 1px solid #ccc;
+    padding: 4px 0px;
+}
+.islandora_solr_result .solr-field:last-child
+{
+    border-bottom: 1px solid #ccc;
+}
+.islandora_solr_result .solr-field
+{
+  float: left;
+  width: 100%;
+}
