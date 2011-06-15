@@ -179,7 +179,11 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   $variables['db_values'] = _islandora_solr_custom_db_values(); // this variable might be more useful as the db values are parsed in the solrconfig order using the results of _islandora_solr_custom_solrconfig().
   $db_values = $variables['db_values'];
   $variables['style'] = variable_get('islandora_solr_custom_style','div');
+  $variables['table_rendered'] = ''; // set the variable. If the table style is selected, this variable will be populated with a rendered table.
+  $variables['switch'] = variable_get('islandora_solr_custom_switch', 0);
+  $variables['switch_rendered'] = ''; // set the variable. If the display switch is enabled, this variable will be populated with a rendered link.
   $variables['css'] = variable_get('islandora_solr_custom_css', 1);
+
   
   // include css or not
   $css = variable_get('islandora_solr_custom_css', 1);
@@ -216,6 +220,47 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
 
   // dsm($resultsArray);
   $variables['results'][] = $resultsArray;
+  }
+  
+  
+  // if style is set to table, render the table.
+  if ($variables['style'] == 'table') {
+    if ($variables['results'] != '') {
+      // Table headers.
+	    $header = array();
+	    foreach ($variables['db_values'] as $key => $result) {
+	      if ($result['exclude_label'] == 0) {
+	        $header[] = $result['label'];
+	      }
+	      else {
+	        $header[] = '';
+	      }
+	    }
+	     
+	    // Table rows
+      $rows = array();
+	    foreach ($variables['results'] as $key => $result) {
+  	    $row = array();
+  	  
+		    foreach ($result as $key => $value) {
+		      $row[] = $value['value'];
+		    }
+			  $rows[] = $row;
+	    }
+ 
+      $output = theme('table', $header, $rows);
+    }
+    else {
+      $output = '<p>' . t('Your search yielded no results') . '</p>';
+    }
+    $variables['table_rendered'] = $output;
+  }
+  
+  // if display switch is set, render the link
+  if ($variables['switch'] == 1  AND $variables['results'] != '') {
+
+    $variables['switch_rendered'] = l(t('Switch display'), 'fake_link');
+  
   }
 }
 
@@ -293,6 +338,10 @@ function _islandora_solr_custom_markup_description($pos) {
  * Variables available:
  * - $base_url: The base url of the current website. eg: http://example.com .
  * - $user: The user object.
+ *
+ * - $style: the style of the display (\'div\' or \'table\')
+ * - $results: the array containing the solr search results
+ * - $table_rendered: if the display style is set to \'table\', this will contain the rendered table
  *
  */
 ?>

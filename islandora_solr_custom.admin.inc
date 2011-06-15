@@ -29,9 +29,19 @@ function islandora_solr_custom_admin_settings() {
     '#description' => t('Fill out the solr fields you want to display in the search results. One field name per line.'),
   );
   */
-  $form['style'] = array(
-    '#type' => 'select',
+  
+  $form['display_style'] = array(
+    '#type' => 'fieldset',
     '#title' => t('Display style'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#tree' => TRUE, // this attribute is important to return the submitted values in a deeper nested arrays in $form_state['values'] . See http://drupal.org/node/751826
+    '#description' => t('Configure the display style.'),
+    '#weight' => -1,
+  );
+  $form['display_style']['style'] = array(
+    '#type' => 'select',
+    '#title' => t('Style'),
     '#default_value' => variable_get('islandora_solr_custom_style','div'),
     '#options' => array(
       'div' => t('Div'),
@@ -39,6 +49,12 @@ function islandora_solr_custom_admin_settings() {
     ),
     '#description' => t('Set the style of the solr search results.'),
     '#weight' => -10,
+  );
+  $form['display_style']['switch'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Add display switch link?'),
+    '#default_value' => variable_get('islandora_solr_custom_switch', 0),
+    '#description' => t('Check if you want to include a link to switch between the two display styles.'),
   );
   $form['css'] = array(
     '#type' => 'checkbox',
@@ -184,7 +200,10 @@ function islandora_solr_custom_settings_form_submit($form, &$form_state) {
   }
   
   // saving the style result
-  variable_set('islandora_solr_custom_style', $form_state['values']['style']);
+  variable_set('islandora_solr_custom_style', $form_state['values']['display_style']['style']);
+  
+  // saving the switch result
+  variable_set('islandora_solr_custom_switch', $form_state['values']['display_style']['switch']);
   
   // saving the css result
   variable_set('islandora_solr_custom_css', $form_state['values']['css']);
