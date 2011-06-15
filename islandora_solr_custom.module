@@ -150,7 +150,7 @@ function theme_islandora_solr_custom_admin_settings($form) {
 	$header[] = t('show markup when empty?');
   //dsm($form);
   $output = '';
-  //$output = drupal_render($form['style']);  // render the dropdown before the table. Not sure if I want to keep this.
+  //$output = drupal_render($form['display']);  // render the dropdown before the table. Not sure if I want to keep this.
 	$output .= theme('table', $header, $rows);
 	$output .= drupal_render($form);
   
@@ -178,12 +178,31 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   $variables['field_order'] = _islandora_solr_custom_solrconfig(); // not sure if this is really needed, but I'll keep it in for now.
   $variables['db_values'] = _islandora_solr_custom_db_values(); // this variable might be more useful as the db values are parsed in the solrconfig order using the results of _islandora_solr_custom_solrconfig().
   $db_values = $variables['db_values'];
-  $variables['style'] = variable_get('islandora_solr_custom_style','div');
+  $variables['display'] = variable_get('islandora_solr_custom_display','div');
+  $variables['display_url'] = (isset($_GET['display']) ? $_GET['display'] : NULL);
   $variables['table_rendered'] = ''; // set the variable. If the table style is selected, this variable will be populated with a rendered table.
   $variables['switch'] = variable_get('islandora_solr_custom_switch', 0);
   $variables['switch_rendered'] = ''; // set the variable. If the display switch is enabled, this variable will be populated with a rendered link.
   $variables['css'] = variable_get('islandora_solr_custom_css', 1);
 
+  // set $variables['style'];
+  $variables['style'] = '';
+  if ($variables['display_url'] != NULL) {
+    if ($variables['display_url'] == 'div') {
+      $variables['style'] = 'div';
+    }
+    elseif ($variables['display_url'] == 'table') {
+      $variables['style'] = 'table';
+    }
+    else {
+    $variables['style'] = $variables['display'];
+    }
+  }
+  else {
+    $variables['style'] = $variables['display'];
+  }
+  
+  dsm($variables);
   
   // include css or not
   $css = variable_get('islandora_solr_custom_css', 1);
@@ -223,7 +242,7 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   }
   
   
-  // if style is set to table, render the table.
+  // if 'display' is set to table, render the table.
   if ($variables['style'] == 'table') {
     if ($variables['results'] != '') {
       // Table headers.
@@ -259,7 +278,49 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   // if display switch is set, render the link
   if ($variables['switch'] == 1  AND $variables['results'] != '') {
 
-    $variables['switch_rendered'] = l(t('Switch display'), 'fake_link');
+    $display = ''; // set $display
+    
+    dsm($_GET['page']);
+
+      $db_display = $variables['display'];
+      $switch_style = ''; // this is will be the oposite display style than then one enabled.
+      if ($db_display == 'table') {
+        $switch_style = 'div';
+      }
+      elseif ($db_display == 'div') {
+        $switch_style = 'table';
+      }
+
+    
+
+    if (isset($_GET['display'])) {
+      if ($_GET['display'] == 'table') {
+        $display = 'div';
+      }
+      elseif ($_GET['display'] == 'div') {
+        $display = 'table';
+      }
+      else {
+        $display = $switch_style; // if the display style is not properly set in the url, choose the oposite of the one enabled in the DB.
+      }    
+    }
+    else {
+      $display = $switch_style; // if the display style is not set in the url, choose the oposite of the one enabled in the DB.
+    }
+    
+    
+    $curr_url = $base_url . $_SERVER['REQUEST_URI'];
+
+    if (isset($_GET['page'])) {
+      $curr_url = str_replace('&display=' . $_GET['display'], '', $curr_url);
+      $curr_url = $curr_url . '&display=' . $display;
+    }
+    else {
+      $curr_url = str_replace('?display=' . $_GET['display'], '', $curr_url);
+      $curr_url = $curr_url . '?display=' . $display;
+    }
+
+    $variables['switch_rendered'] = l(t('Switch display'), $curr_url);
   
   }
 }

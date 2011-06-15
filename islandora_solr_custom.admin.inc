@@ -39,15 +39,15 @@ function islandora_solr_custom_admin_settings() {
     '#description' => t('Configure the display style.'),
     '#weight' => -1,
   );
-  $form['display_style']['style'] = array(
+  $form['display_style']['display'] = array(
     '#type' => 'select',
-    '#title' => t('Style'),
-    '#default_value' => variable_get('islandora_solr_custom_style','div'),
+    '#title' => t('Default display style'),
+    '#default_value' => variable_get('islandora_solr_custom_display','div'),
     '#options' => array(
       'div' => t('Div'),
       'table' => t('Table'),
     ),
-    '#description' => t('Set the style of the solr search results.'),
+    '#description' => t('Set the display style of the solr search results.'),
     '#weight' => -10,
   );
   $form['display_style']['switch'] = array(
@@ -200,7 +200,7 @@ function islandora_solr_custom_settings_form_submit($form, &$form_state) {
   }
   
   // saving the style result
-  variable_set('islandora_solr_custom_style', $form_state['values']['display_style']['style']);
+  variable_set('islandora_solr_custom_display', $form_state['values']['display_style']['display']);
   
   // saving the switch result
   variable_set('islandora_solr_custom_switch', $form_state['values']['display_style']['switch']);
