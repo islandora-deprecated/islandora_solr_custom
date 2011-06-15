@@ -202,8 +202,6 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
     $variables['style'] = $variables['display'];
   }
   
-  dsm($variables);
-  
   // include css or not
   $css = variable_get('islandora_solr_custom_css', 1);
   if ($css == 1) {
@@ -215,7 +213,6 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   foreach ($variables['results_raw']->response->docs as $doc) {
   
     $resultsArray = array();
-    $zebra = 'odd';
     // go over each field within a search result object
     foreach($db_values as $db_value) {
       
@@ -232,9 +229,7 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
           $resultsArray[$field]['class'] = strtolower( preg_replace('/[^A-Za-z0-9]/', '-', $db_value['field']) ); // turn the field name in a string that is appropriate to use as a class name.
           $resultsArray[$field]['exclude_label'] = $db_value['exclude_label'];
           $resultsArray[$field]['markup'] = $db_value['markup'];
-          $resultsArray[$field]['zebra'] = $zebra;
-          $zebra = ($zebra == 'odd' ? 'even' : 'odd'); 
-     
+   
     }
 
   // dsm($resultsArray);
@@ -323,6 +318,7 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
     $variables['switch_rendered'] = l(t('Switch display'), $curr_url);
   
   }
+  dsm($variables);
 }
 
 
