@@ -91,7 +91,7 @@ function islandora_solr_custom_admin_settings() {
     '#tree' => TRUE, // this attribute is important to return the submitted values in a deeper nested arrays in $form_state['values'] . See http://drupal.org/node/751826
   );
   
-  $solrconfig = _islandora_solr_custom_db_values();
+  $solrconfig = _islandora_solr_custom_db_values($check = TRUE); // get the solrconfig.xml and DB results. Also fix the differences between solrconfig.xml and the DB
   foreach ($solrconfig as $field) {
   
     $fieldname = $field['field'];
@@ -272,11 +272,12 @@ function islandora_solr_custom_settings_form_submit($form, &$form_state) {
 /**
  * Function that returns the DB input and saves new data if the table is empty.
  * It will also output the database values in the order of the values in solrconfig.xml.
+ * @param $check: FALSE means don't check for changes in the DB. TRUE means check for changes in the DB.
  * @return islandora_solr_custom DB values
  * @TODO add a solution/notification if it can't connect to solrconfig.xml correctly
  */
  
-function _islandora_solr_custom_db_values() {
+function _islandora_solr_custom_db_values($check) {
 
 // This selects all rows in the order of the database:
 //  $sql = "SELECT * FROM {islandora_solr_custom}";
@@ -299,7 +300,7 @@ function _islandora_solr_custom_db_values() {
     $row_result = db_fetch_array($res);
     
     // if the field is not in the DB, add it using default settings and fetch it again.
-    if (!is_array($row_result)) {
+    if (!is_array($row_result) AND $check == TRUE) {
       // add it to the DB
       db_query("INSERT INTO {islandora_solr_custom} (field, label, exclude_label, markup) VALUES('%s', '%s', %d, %d)", $field, $field, 0, 1);
       // and fetch it again
@@ -312,16 +313,18 @@ function _islandora_solr_custom_db_values() {
     
   }
    
+   
   // clean up rows that are not in the $solrconfig results
-  $sql = "SELECT * FROM {islandora_solr_custom}";
-  $res = db_query($sql);
-  while ($db_array = db_fetch_array($res)) {
-    if (!in_array($db_array['field'], $solrconfig)) {
+  if ($check == TRUE) {
+    $sql = "SELECT * FROM {islandora_solr_custom}";
+    $res = db_query($sql);
+    while ($db_array = db_fetch_array($res)) {
+      if (!in_array($db_array['field'], $solrconfig)) {
     
-      $field = $db_array['field'];
-      db_query("DELETE FROM {islandora_solr_custom} WHERE field = '%s'", $field);
-      drupal_set_message( t("@field is not defined in solrconfig.xml and is removed.", array('@field' => $field)) );
-    
+        $field = $db_array['field'];
+        db_query("DELETE FROM {islandora_solr_custom} WHERE field = '%s'", $field);
+        drupal_set_message( t("@field is not defined in solrconfig.xml and is removed.", array('@field' => $field)) );
+      }
     }
     //dsm($db_array);
   }

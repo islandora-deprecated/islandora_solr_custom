@@ -174,7 +174,9 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   $variables['base_url'] = $base_url;
   // include solr field order generated from solrconfig.xml
   $variables['field_order'] = _islandora_solr_custom_solrconfig(); // not sure if this is really needed, but I'll keep it in for now.
-  $variables['db_values'] = _islandora_solr_custom_db_values(); // this variable might be more useful as the db values are parsed in the solrconfig order using the results of _islandora_solr_custom_solrconfig().
+  // this variable might be more useful as the db values are parsed in the solrconfig order using the results of _islandora_solr_custom_solrconfig().
+  // get the solrconfig.xml and DB results. Don't check or fix any differences between solrconfig.xml and the DB
+  $variables['db_values'] = _islandora_solr_custom_db_values($check = FALSE);
   $db_values = $variables['db_values'];
   $variables['display'] = variable_get('islandora_solr_custom_display', 'div');
   $variables['display_url'] = (isset($_GET['display']) ? $_GET['display'] : NULL);
@@ -213,20 +215,20 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
     $resultsArray = array();
     // go over each field within a search result object
     foreach ($db_values as $db_value) {
+      if (isset($doc->$db_value['field'])) {
+        $value = $doc->$db_value['field'];
+        $field = $db_value['field'];
       
-      $value = $doc->$db_value['field'];
-      $field = $db_value['field'];
-      
-          if (is_array($value)) {
-            $value = implode(", ", $value);
-          }
-          // set the fields
-          $resultsArray[$field]['value'] = $value;  
-          $resultsArray[$field]['label'] = $db_value['label'];
-          $resultsArray[$field]['class'] = strtolower( preg_replace('/[^A-Za-z0-9]/', '-', $db_value['field']) ); // turn the field name in a string that is appropriate to use as a class name.
-          $resultsArray[$field]['exclude_label'] = $db_value['exclude_label'];
-          $resultsArray[$field]['markup'] = $db_value['markup'];
-   
+        if (is_array($value)) {
+          $value = implode(", ", $value);
+        }
+        // set the fields
+        $resultsArray[$field]['value'] = $value;  
+        $resultsArray[$field]['label'] = $db_value['label'];
+        $resultsArray[$field]['class'] = strtolower( preg_replace('/[^A-Za-z0-9]/', '-', $db_value['field']) ); // turn the field name in a string that is appropriate to use as a class name.
+        $resultsArray[$field]['exclude_label'] = $db_value['exclude_label'];
+        $resultsArray[$field]['markup'] = $db_value['markup'];
+      }
     }
 
   $variables['results'][] = $resultsArray;
