@@ -1,6 +1,7 @@
-<?php
+<?php // $Id$
 
 /**
+ * @file
  * Implementation of hook_install
  */
  

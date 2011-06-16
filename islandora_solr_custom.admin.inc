@@ -1,4 +1,10 @@
-<?php
+<?php // $Id$
+
+/**
+ * @file
+ * Holds the admin functions.
+ */
+
 
 /**
  * Function to set debug options. It provides dummy search results and dummy solrconfig.xml field results.
@@ -42,7 +48,7 @@ function islandora_solr_custom_admin_settings() {
   $form['display_style']['display'] = array(
     '#type' => 'select',
     '#title' => t('Default display style'),
-    '#default_value' => variable_get('islandora_solr_custom_display','div'),
+    '#default_value' => variable_get('islandora_solr_custom_display', 'div'),
     '#options' => array(
       'div' => t('Div'),
       'table' => t('Table'),
@@ -86,7 +92,7 @@ function islandora_solr_custom_admin_settings() {
   );
   
   $solrconfig = _islandora_solr_custom_db_values();
-  foreach($solrconfig as $field) {
+  foreach ($solrconfig as $field) {
   
     $fieldname = $field['field'];
     
@@ -187,8 +193,8 @@ function islandora_solr_custom_settings_form_submit($form, &$form_state) {
   
  //This selects all rows in the order of the database:
   $sql = "SELECT * FROM {islandora_solr_custom}";
-	$res = db_query($sql);
-  while($db_array = db_fetch_array($res)) {
+  $res = db_query($sql);
+  while ($db_array = db_fetch_array($res)) {
     $item[] = $db_array;
   }
   //dsm($item);  
@@ -196,7 +202,7 @@ function islandora_solr_custom_settings_form_submit($form, &$form_state) {
   // saving the table results
   // saving only the results of fields that are already in the DB to prevent saving empty values.
   $table_results = $form_state['values']['islandora_solr_custom_table'];
-  foreach($table_results as $result) {
+  foreach ($table_results as $result) {
   
     $field = $result['hidden'];
    // $new = $result['new'];
@@ -288,18 +294,16 @@ function _islandora_solr_custom_db_values() {
   // retrieve all information from the DB table and output them in the order as defined in solrconfig.xml
   $item = array();
   $solrconfig = _islandora_solr_custom_solrconfig();
-  foreach($solrconfig as $field) {
-    $sql = "SELECT * FROM {islandora_solr_custom} WHERE field = '$field'";
-    $res = db_query($sql);
+  foreach ( $solrconfig as $field) {
+    $res = db_query("SELECT * FROM {islandora_solr_custom} WHERE field = '%s'", $field);
     $row_result = db_fetch_array($res);
     
     // if the field is not in the DB, add it using default settings and fetch it again.
-    if(!is_array($row_result)) {
+    if (!is_array($row_result)) {
       // add it to the DB
       db_query("INSERT INTO {islandora_solr_custom} (field, label, exclude_label, markup) VALUES('%s', '%s', %d, %d)", $field, $field, 0, 1);
       // and fetch it again
-      $sql = "SELECT * FROM {islandora_solr_custom} WHERE field = '$field'";
-      $res = db_query($sql);
+      $res = db_query("SELECT * FROM {islandora_solr_custom} WHERE field = '%s'", $field);
       $row_result = db_fetch_array($res);
       $row_result['new'] = TRUE; // if the row just got added now, add a 'new' value. This will be put in a hidden field. This is needed so when saving table results while there are new fields added, the results will be saved, but no values would be set yet. This would override the default values set in this function with empty values.
     }
@@ -310,13 +314,12 @@ function _islandora_solr_custom_db_values() {
    
   // clean up rows that are not in the $solrconfig results
   $sql = "SELECT * FROM {islandora_solr_custom}";
-	$res = db_query($sql);
-  while($db_array = db_fetch_array($res)) {
-    if(!in_array($db_array['field'], $solrconfig)) {
+  $res = db_query($sql);
+  while ($db_array = db_fetch_array($res)) {
+    if (!in_array($db_array['field'], $solrconfig)) {
     
       $field = $db_array['field'];
-      $sql = "DELETE FROM {islandora_solr_custom} WHERE field = '$field'";
-      db_query($sql);
+      db_query("DELETE FROM {islandora_solr_custom} WHERE field = '%s'", $field);
       drupal_set_message( t("@field is not defined in solrconfig.xml and is removed.", array('@field' => $field)) );
     
     }
@@ -326,7 +329,7 @@ function _islandora_solr_custom_db_values() {
    
   
   //dsm($item);
-	
+
   return $item;
 }
 
@@ -343,22 +346,23 @@ function _islandora_solr_custom_solrconfig() {
   $debug = _islandora_solr_custom_debug();
   
   // setup a variable for debugging. I probably should remove this stuff later.
-  if($debug == TRUE) {
+  if ($debug == TRUE) {
   
     $result = array('dc.title', 'dc.foo1', 'dc.foo2', 'dc.foo3');
   
-  } else {
+  } 
+  else {
 
   // xpath experiment
-  $xmlDoc = new DOMDocument();
-  $xmlFile = 'http://' . variable_get('islandora_solr_search_block_url', 'localhost:8080/solr') . '/admin/file/?file=solrconfig.xml';
-  $xmlDoc->load($xmlFile, LIBXML_NOCDATA);
-  $xpath = new DOMXPath($xmlDoc);
+  $xml_doc = new DOMDocument();
+  $xml_file = 'http://' . variable_get('islandora_solr_search_block_url', 'localhost:8080/solr') . '/admin/file/?file=solrconfig.xml';
+  $xml_doc->load($xml_file, LIBXML_NOCDATA);
+  $xpath = new DOMXPath($xml_doc);
 
   // xPath query.
   // variable wich states which requestHandler we're dealing with.
-  $requestHandlerVariable = variable_get('islandora_solr_search_block_request_handler', t('standard'));
-  $query = '//requestHandler[@name="'. $requestHandlerVariable .'"]//str[@name="fl"]';
+  $request_handler_variable = variable_get('islandora_solr_search_block_request_handler', t('standard'));
+  $query = '//requestHandler[@name="' . $request_handler_variable . '"]//str[@name="fl"]';
 
   $entries = $xpath->query($query);
   
@@ -368,13 +372,13 @@ function _islandora_solr_custom_solrconfig() {
   }
   
   // set error message if impossible to connect.
-  if($result == '') {
-    drupal_set_message( t('Failed to connect to @string. Please check your <a href="@link">solr settings</a>.' , array('@string' => $xmlFile, '@link' => 'admin/settings/islandora_solr_search')), 'error' );
+  if ($result == '') {
+    drupal_set_message( t('Failed to connect to @string. Please check your <a href="@link">solr settings</a>.' , array('@string' => $xml_file, '@link' => 'admin/settings/islandora_solr_search')), 'error' );
     $result = FALSE;
   }
   
   // exploding $result into an array
-  if($result != FALSE) $result = explode(',', $result);
+  if ($result != FALSE) $result = explode(',', $result);
   
   }
   

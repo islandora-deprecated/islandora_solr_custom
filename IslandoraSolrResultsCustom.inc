@@ -1,6 +1,7 @@
-<?php
+<?php // $Id$
 
-/*
+/**
+ * @file
  * contains methods to search solr and display results.  depends on Apache_Solr_Php client.
  */
 
@@ -38,8 +39,9 @@ class IslandoraSolrResultsCustom extends IslandoraSolrResults {
    */
   function printResults($results) {
  
-    if ( variable_get('islandora_solr_search_debug_mode', 0) ) { // debug dump
-      $results_r .= "<pre>Results: ".print_r($results,true)."</pre>";
+    if ( variable_get('islandora_solr_search_debug_mode', 0) ) {
+      // debug dump
+      $results_r .= "<pre>Results: " . print_r($results, TRUE) . "</pre>";
       $fieldset_r = array(
         '#title' => t("Raw Results"),                                                                                                                                             
         '#collapsible' => TRUE,
