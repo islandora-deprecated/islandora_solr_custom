@@ -372,7 +372,8 @@ function _islandora_solr_custom_markup_render($markup) {
   $output = '';
   
   $output .= '<div class="form-item">';
-  $output .= '<p>'.t('In your theme create a template file called islandora_solr_custom.tpl.php and paste in the code below. This will give you a nice start to customize your solr search results. You can then add wrapper elements, change labels, generate images from the repository, etc. Don\'t forget to rebuild the theme registry after doing this.').'</p>';
+  $output .= '<p>' . t('In your theme create a template file called <strong>islandora_solr_custom.tpl.php</strong> and paste in the code below. This will give you a nice start to customize your solr search results. You can then add wrapper elements, change labels, generate images from the repository, etc. Don\'t forget to rebuild the theme registry after doing this.') . '</p>';
+  $output .= '<p>' . t("Label overrides provided by the table above are applied, but label exclusion and showing markup when empty are not. Goal is for you to take full control over the output. It is also possible to override the theme functions of the table display and the switch link.") . '</p>';
   $output .= '<pre>';
   $output .= _islandora_solr_custom_markup_div($markup);
   $output .= '</pre>';
@@ -408,9 +409,9 @@ function _islandora_solr_custom_markup_div($markup) {
  * - $base_url: The base url of the current website. eg: http://example.com .
  * - $user: The user object.
  *
- * - $style: the style of the display ('div' or 'table'). Set in admin page by default. Overridden by the query value: ?display=foo
+ * - $style: the style of the display (\'div\' or \'table\'). Set in admin page by default. Overridden by the query value: ?display=foo
  * - $results: the array containing the solr search results
- * - $table_rendered: If the display style is set to 'table', this will contain the rendered table.
+ * - $table_rendered: If the display style is set to \'table\', this will contain the rendered table.
  *    For theme overriding, see: theme_islandora_solr_custom_table() 
  * - $switch_rendered: The rendered switch to toggle between display styles
  *    For theme overriding, see: theme_islandora_solr_custom_switch() 

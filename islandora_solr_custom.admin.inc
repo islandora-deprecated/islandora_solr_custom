@@ -131,13 +131,13 @@ function islandora_solr_custom_admin_settings() {
     drupal_set_message(t('The settings have not been saved because of the errors.'), 'error');
   }
   
-  $form['div'] = array(
+  $form['custom_markup'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Div based markup'),
+    '#title' => t('Custom markup'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
-  $form['div']['islandora_solr_custom_output'] = array(
+  $form['custom_markup']['islandora_solr_custom_output'] = array(
     '#type' => 'markup',
     '#value' => _islandora_solr_custom_markup_render(_islandora_solr_custom_solrconfig()),
   );
