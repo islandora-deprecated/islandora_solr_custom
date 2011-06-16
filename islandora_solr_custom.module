@@ -57,18 +57,11 @@ function islandora_solr_custom_help($path, $arg) {
 
   switch ($path) {
     case 'admin/help#islandora_solr_config':
-      return t("When 'Custom Solr Configuration Settings' is selected from the configuration drop-down in the<br />
-        !page the following settings will be used.
-        <ul>
-        <li>Module - islandora_solr_custom</l1>
-        <li>File - IslandoraSolrResultsCustom.inc</l1>
-        <li>Class - IslandoraSolrResultsCustom</l1>
-        <li>Method - displayResults</l1>
-        </ul>
-        ", array('!page' => l("Islandora_solr_search configuration page", 'admin/settings/islandora_solr_search'),)
-
-
-      );
+      return t('The islandora_solr_custom module provides a display type for the islandora_solr_search module. Islandora_solr_custom automatically looks for the fields set for display in !solrconfig. It outputs the fields in the order that they are defined in the requestHandler. Islandora_solr_custom will look at the settings set at !page to find solrconfig.xml and the requestHandler. You can quickly customize the output style of your search results by changing the settings in the admin section or you can take full control by overriding the template file.', array('!page' => l(t("Islandora_solr_search configuration page"), 'admin/settings/islandora_solr_search'), '!solrconfig' => l(t('solrconfig.xml'), 'http://wiki.apache.org/solr/SolrConfigXml') ));
+    case 'admin/settings/islandora_solr_search/custom':
+      return t('The islandora_solr_custom module provides a display type for the islandora_solr_search module. Islandora_solr_custom automatically looks for the fields set for display in !solrconfig. It outputs the fields in the order that they are defined in the requestHandler. Islandora_solr_custom will look at the settings set at !page to find solrconfig.xml and the requestHandler. You can quickly customize the output style of your search results by changing the settings in the admin section or you can take full control by overriding the template file.', array('!page' => l(t("Islandora_solr_search configuration page"), 'admin/settings/islandora_solr_search'), '!solrconfig' => l(t('solrconfig.xml'), 'http://wiki.apache.org/solr/SolrConfigXml') ));
+      
+      
   }
 }
 
@@ -154,10 +147,12 @@ function theme_islandora_solr_custom_admin_settings($form) {
 	$header[] = t('label');
 	$header[] = t('exclude label?');
 	$header[] = t('show markup when empty?');
-  //dsm($form);
+  
+  // put the rendered table in another fieldset.
+  $form['islandora_solr_custom_table_output']['table_output_markup']['#value'] = theme('table', $header, $rows);
+  
   $output = '';
   //$output = drupal_render($form['display']);  // render the dropdown before the table. Not sure if I want to keep this.
-	$output .= theme('table', $header, $rows);
 	$output .= drupal_render($form);
   
   //dsm($output);
@@ -372,8 +367,6 @@ function _islandora_solr_custom_markup_render($markup) {
   $output = '';
   
   $output .= '<div class="form-item">';
-  $output .= '<p>' . t('In your theme create a template file called <strong>islandora_solr_custom.tpl.php</strong> and paste in the code below. This will give you a nice start to customize your solr search results. You can then add wrapper elements, change labels, generate images from the repository, etc. Don\'t forget to rebuild the theme registry after doing this.') . '</p>';
-  $output .= '<p>' . t("Label overrides provided by the table above are applied, but label exclusion and showing markup when empty are not. Goal is for you to take full control over the output. It is also possible to override the theme functions of the table display and the switch link.") . '</p>';
   $output .= '<pre>';
   $output .= _islandora_solr_custom_markup_div($markup);
   $output .= '</pre>';

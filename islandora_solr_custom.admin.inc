@@ -56,7 +56,7 @@ function islandora_solr_custom_admin_settings() {
     '#default_value' => variable_get('islandora_solr_custom_switch', 0),
     '#description' => t('Check if you want to include a link to switch between the two display styles.'),
   );
-  $form['css'] = array(
+  $form['display_style']['css'] = array(
     '#type' => 'checkbox',
     '#title' => t('Include css?'),
     '#default_value' => variable_get('islandora_solr_custom_css', 1),
@@ -64,22 +64,30 @@ function islandora_solr_custom_admin_settings() {
   );
 
   
+  // create a new fieldset where we can put the rendered table in. Couldn't make that work with the actual fieldset of the table form items.  
+  $form['islandora_solr_custom_table_output'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Field settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#tree' => FALSE, // not needed as this fieldset just outputs the rendered table.
+    '#description' => t('Modify the field settings'),
+    '#weight' => -1,
+  );
+  $form['islandora_solr_custom_table_output']['table_output_markup'] = array(
+    '#type' => 'markup',
+    '#value' => '',
+  );
   
-  
+  // set the table form items
   $form['islandora_solr_custom_table'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Field settings'), // doesn't work with table render.
-    '#collapsible' => FALSE, // doesn't work with table render.
-    '#collapsed' => FALSE,
     '#tree' => TRUE, // this attribute is important to return the submitted values in a deeper nested arrays in $form_state['values'] . See http://drupal.org/node/751826
-    '#description' => t('description'), // doesn't work with table render.
-    '#weight' => -1,
   );
   
   $solrconfig = _islandora_solr_custom_db_values();
   foreach($solrconfig as $field) {
   
-    //dsm($field);
     $fieldname = $field['field'];
     
     $form['islandora_solr_custom_table'][$fieldname]['field'] = array(
@@ -136,6 +144,8 @@ function islandora_solr_custom_admin_settings() {
     '#title' => t('Custom markup'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
+    '#description' =>   '<p>' . t('In your theme create a template file called <strong>islandora_solr_custom.tpl.php</strong> and paste in the code below. This will give you a nice start to customize your solr search results. You can then add wrapper elements, change labels, generate images from the repository, etc. Don\'t forget to rebuild the theme registry after doing this.') . '</p>' . 
+                        '<p>' . t("Label overrides provided by the table above are applied, but label exclusion and showing markup when empty are not. Goal is for you to take full control over the output. It is also possible to override the theme functions of the table display and the switch link.") . '</p>',
   );
   $form['custom_markup']['islandora_solr_custom_output'] = array(
     '#type' => 'markup',
@@ -206,7 +216,7 @@ function islandora_solr_custom_settings_form_submit($form, &$form_state) {
   variable_set('islandora_solr_custom_switch', $form_state['values']['display_style']['switch']);
   
   // saving the css result
-  variable_set('islandora_solr_custom_css', $form_state['values']['css']);
+  variable_set('islandora_solr_custom_css', $form_state['values']['display_style']['css']);
   
   
   
