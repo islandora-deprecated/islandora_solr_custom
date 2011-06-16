@@ -11,8 +11,10 @@
  *
  * - $style: the style of the display ('div' or 'table'). Set in admin page by default. Overridden by the query value: ?display=foo
  * - $results: the array containing the solr search results
- * - $table_rendered: if the display style is set to 'table', this will contain the rendered table
+ * - $table_rendered: If the display style is set to 'table', this will contain the rendered table.
+ *    For theme overriding, see: theme_islandora_solr_custom_table() 
  * - $switch_rendered: The rendered switch to toggle between display styles
+ *    For theme overriding, see: theme_islandora_solr_custom_switch() 
  *
  */
 ?>

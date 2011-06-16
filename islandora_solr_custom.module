@@ -112,6 +112,12 @@ function islandora_solr_custom_menu() {
      'islandora_solr_custom_admin_settings' => array(
        'arguments' => array('form' => NULL),
      ),
+     'islandora_solr_custom_switch' => array(
+       'arguments' => array('curr_url' => NULL),
+     ),
+     'islandora_solr_custom_table' => array(
+       'arguments' => array('db_values' => NULL, 'results' => NULL),
+     ),
    );
  
  }
@@ -240,29 +246,11 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   // if 'display' is set to table, render the table.
   if ($variables['style'] == 'table') {
     if ($variables['results'] != '') {
-      // Table headers.
-	    $header = array();
-	    foreach ($variables['db_values'] as $key => $result) {
-	      if ($result['exclude_label'] == 0) {
-	        $header[] = t($result['label']);
-	      }
-	      else {
-	        $header[] = '';
-	      }
-	    }
-	     
-	    // Table rows
-      $rows = array();
-	    foreach ($variables['results'] as $key => $result) {
-  	    $row = array();
-  	  
-		    foreach ($result as $key => $value) {
-		      $row[] = $value['value'];
-		    }
-			  $rows[] = $row;
-	    }
- 
-      $output = theme('table', $header, $rows);
+    
+      $db_values = $variables['db_values'];
+      $results = $variables['results'];
+    
+      $output = theme('islandora_solr_custom_table', $db_values, $results );
     }
     else {
       $output = '<p>' . t('Your search yielded no results') . '</p>';
@@ -315,7 +303,7 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
       $curr_url = $curr_url . '?display=' . $display;
     }
 
-    $variables['switch_rendered'] = l(t('Switch display'), $curr_url);
+    $variables['switch_rendered'] = theme('islandora_solr_custom_switch', $curr_url);
   
   }
   dsm($variables);
@@ -323,7 +311,55 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
 
 
 
+/**
+ * Theme function for theming the switch link.
+ * The theme function is really minimal, but allows for overriding they way the switch is themed.
+ *
+ * @return rendered switch link
+ */
+ 
+function theme_islandora_solr_custom_switch($curr_url) {
 
+  return l(t('Switch display'), $curr_url);
+
+}
+
+
+
+/**
+ * Theme function for theming the table display.
+ *
+ * @return rendered table display
+ */
+ 
+function theme_islandora_solr_custom_table($db_values, $results) {
+  $output = '';
+    // Table headers.
+	  $header = array();
+	  foreach ($db_values as $key => $result) {
+	    if ($result['exclude_label'] == 0) {
+	      $header[] = t($result['label']);
+	    }
+	    else {
+	      $header[] = '';
+	    }
+	  }
+	   
+	  // Table rows
+    $rows = array();
+	  foreach ($results as $key => $result) {
+  	  $row = array();
+  	
+		  foreach ($result as $key => $value) {
+		    $row[] = $value['value'];
+		  }
+		 $rows[] = $row;
+	  }
+    
+    $output = theme('table', $header, $rows);
+
+  return $output;
+}
 
 
 /**
@@ -361,7 +397,8 @@ function _islandora_solr_custom_markup_div($markup) {
   // set $output variable
   $output = '';
   
-  $output .= '<?php // $Id $
+  $output .= '<?php
+// $Id $
 /**
  * @file islandora_solr_custom.tpl.php
  * Islandora solr search results template
@@ -371,10 +408,12 @@ function _islandora_solr_custom_markup_div($markup) {
  * - $base_url: The base url of the current website. eg: http://example.com .
  * - $user: The user object.
  *
- * - $style: the style of the display (\'div\' or \'table\'). Set in admin page by default. Overridden by the query value: ?display=foo
+ * - $style: the style of the display ('div' or 'table'). Set in admin page by default. Overridden by the query value: ?display=foo
  * - $results: the array containing the solr search results
- * - $table_rendered: if the display style is set to \'table\', this will contain the rendered table
+ * - $table_rendered: If the display style is set to 'table', this will contain the rendered table.
+ *    For theme overriding, see: theme_islandora_solr_custom_table() 
  * - $switch_rendered: The rendered switch to toggle between display styles
+ *    For theme overriding, see: theme_islandora_solr_custom_switch() 
  *
  */
 ?>

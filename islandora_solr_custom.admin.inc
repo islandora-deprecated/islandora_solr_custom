@@ -60,7 +60,7 @@ function islandora_solr_custom_admin_settings() {
     '#type' => 'checkbox',
     '#title' => t('Include css?'),
     '#default_value' => variable_get('islandora_solr_custom_css', 1),
-    '#description' => t('Check if you want to include some basic css styling. You can still overwrite css in the theme layer. Only uncheck if you really want to take full control over the css styling.'),
+    '#description' => t('Check if you want to include some basic css styling. You can still overwrite css in the theme layer. Only uncheck if you really want to take full control over the css styling. This will not affect the table display.'),
   );
 
   
