@@ -1,5 +1,5 @@
 <?php
-// $Id $
+
 /**
  * @file islandora_solr_custom.tpl.php
  * Islandora solr search results template

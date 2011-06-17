@@ -1,8 +1,5 @@
 <?php
 
-// $Id$
-
-
 /**
  * @file
  * Configuration module for islandora_solr_search.module
@@ -392,7 +389,7 @@ function _islandora_solr_custom_markup_div($markup) {
   $output = '';
   
   $output .= '<?php
-// $Id $
+
 /**
  * @file islandora_solr_custom.tpl.php
  * Islandora solr search results template
