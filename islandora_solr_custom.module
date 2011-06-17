@@ -435,7 +435,7 @@ function _islandora_solr_custom_markup_div($markup) {
 
   <?php print $table_rendered; ?>
 
-<?php endif; ?>';
+<?php endif;';
 
   return check_plain($output);
 }

@@ -56,4 +56,4 @@
 
   <?php print $table_rendered; ?>
 
-<?php endif; ?>
+<?php endif;
