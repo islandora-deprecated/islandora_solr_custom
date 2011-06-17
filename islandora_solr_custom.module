@@ -213,20 +213,27 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
     $resultsArray = array();
     // go over each field within a search result object
     foreach ($db_values as $db_value) {
+      
+      $field = $db_value['field'];
+      
       if (isset($doc->$db_value['field'])) {
         $value = $doc->$db_value['field'];
-        $field = $db_value['field'];
       
         if (is_array($value)) {
           $value = implode(", ", $value);
         }
-        // set the fields
-        $resultsArray[$field]['value'] = $value;  
-        $resultsArray[$field]['label'] = $db_value['label'];
-        $resultsArray[$field]['class'] = strtolower( preg_replace('/[^A-Za-z0-9]/', '-', $db_value['field']) ); // turn the field name in a string that is appropriate to use as a class name.
-        $resultsArray[$field]['exclude_label'] = $db_value['exclude_label'];
-        $resultsArray[$field]['markup'] = $db_value['markup'];
+          $resultsArray[$field]['value'] = $value;
       }
+      else {
+        $resultsArray[$field]['value'] = '';
+      }
+
+      // set the fields
+      $resultsArray[$field]['label'] = $db_value['label'];
+      $resultsArray[$field]['class'] = strtolower( preg_replace('/[^A-Za-z0-9]/', '-', $db_value['field']) ); // turn the field name in a string that is appropriate to use as a class name.
+      $resultsArray[$field]['exclude_label'] = $db_value['exclude_label'];
+      $resultsArray[$field]['markup'] = $db_value['markup'];
+      
     }
 
   $variables['results'][] = $resultsArray;
