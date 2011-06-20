@@ -9,7 +9,7 @@ function islandora_solr_custom_install() {
 
   drupal_install_schema('islandora_solr_custom');
   
-  $message = t("Islandora Solr Custom <a href ='!link'>configuration page</a>.", array('!link' => 'admin/settings/islandora_solr_search/custom'));
+  $message = t("Islandora Solr Custom <a href ='!link'>configuration page</a>.", array('!link' => '/admin/settings/islandora_solr_search/custom'));
   drupal_set_message($message);
 }
 
