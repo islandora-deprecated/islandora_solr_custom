@@ -30,32 +30,32 @@ function islandora_solr_custom_uninstall() {
 function islandora_solr_custom_schema() {
 
 $schema['islandora_solr_custom'] = array(
-  'description' => t('TODO: please describe this table!'),
+  'description' => t('Solr search results template settings.'),
   'fields' => array(
     'field' => array(
-      'description' => t('TODO: please describe this field!'),
+      'description' => t('The solr field name.'),
       'type' => 'varchar',
       'length' => '256',
       'not null' => TRUE,
     ),
     'label' => array(
-      'description' => t('TODO: please describe this field!'),
+      'description' => t('Optionally overwrite the label for the field.'),
       'type' => 'varchar',
       'length' => '256',
       'not null' => TRUE,
     ),
     'exclude_label' => array(
-      'description' => t('TODO: please describe this field!'),
+      'description' => t('Checkbox value: exclude the label from display.'),
       'type' => 'int',
       'not null' => TRUE,
     ),
     'markup' => array(
-      'description' => t('TODO: please describe this field!'),
+      'description' => t('Checkbox value: show markup even when there is no search result for the field.'),
       'type' => 'int',
       'not null' => TRUE,
     ),
     'position' => array(
-      'description' => t('TODO: please describe this field!'),
+      'description' => t('Field position.'),
       'type' => 'int',
       'not null' => TRUE,
     ),
