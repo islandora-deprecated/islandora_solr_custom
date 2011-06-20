@@ -86,29 +86,31 @@ function islandora_solr_custom_menu() {
 
 
 
-
 /**
  * Implementation of hook_theme()
  */
  
 function islandora_solr_custom_theme() {
-  return array(
-    'islandora_solr_custom' => array(
-      'path' => drupal_get_path('module', 'islandora_solr_custom') . '/theme',
+    // set path
+    $path = drupal_get_path('module', 'islandora_solr_custom') . '/theme';
+    
+    $templates['islandora_solr_custom'] = array(
+      'path' => $path,
       'template' => 'islandora_solr_custom',
       'arguments' => array('results_raw' => NULL),
-    ),
-    'islandora_solr_custom_admin_settings' => array(
+    );
+    $templates['islandora_solr_custom_admin_settings'] = array(
       'arguments' => array('form' => NULL),
-    ),
-    'islandora_solr_custom_switch' => array(
+    );
+    $templates['islandora_solr_custom_switch'] = array(
       'arguments' => array('curr_url' => NULL),
-    ),
-    'islandora_solr_custom_table' => array(
+    );
+    $templates['islandora_solr_custom_table'] = array(
       'arguments' => array('db_values' => NULL, 'results' => NULL),
-    ),
-  );
- 
+    );
+    //$template = drupal_find_theme_templates($templates, '.tpl.php', $path);
+    //dsm($template);
+  return $templates;
 }
  
  

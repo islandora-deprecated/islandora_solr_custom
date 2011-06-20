@@ -7,3 +7,8 @@
     overflow: auto;
     padding: 0.5em;
 }
+
+#islandora-solr-custom-admin-settings .description table
+{
+  margin-top: 0px;
+}
