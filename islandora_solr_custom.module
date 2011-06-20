@@ -91,25 +91,25 @@ function islandora_solr_custom_menu() {
  */
  
 function islandora_solr_custom_theme() {
-    // set path
-    $path = drupal_get_path('module', 'islandora_solr_custom') . '/theme';
+  // set path
+  $path = drupal_get_path('module', 'islandora_solr_custom') . '/theme';
     
-    $templates['islandora_solr_custom'] = array(
+  return array(
+    'islandora_solr_custom' => array(
       'path' => $path,
       'template' => 'islandora_solr_custom',
       'arguments' => array('results_raw' => NULL),
-    );
-    $templates['islandora_solr_custom_admin_settings'] = array(
-      'arguments' => array('form' => NULL),
-    );
-    $templates['islandora_solr_custom_switch'] = array(
-      'arguments' => array('curr_url' => NULL),
-    );
-    $templates['islandora_solr_custom_table'] = array(
-      'arguments' => array('db_values' => NULL, 'results' => NULL),
-    );
-    //$template = drupal_find_theme_templates($templates, '.tpl.php', $path);
-    //dsm($template);
+    ),
+    'islandora_solr_custom_admin_settings' => array(
+    'arguments' => array('form' => NULL),
+    ),
+    'islandora_solr_custom_switch' => array(
+    'arguments' => array('curr_url' => NULL),
+    ),
+    'islandora_solr_custom_table' => array(
+    'arguments' => array('db_values' => NULL, 'results' => NULL),
+    ),
+  );
   return $templates;
 }
  
