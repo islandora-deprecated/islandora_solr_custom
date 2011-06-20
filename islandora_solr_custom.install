@@ -8,6 +8,9 @@
 function islandora_solr_custom_install() {
 
   drupal_install_schema('islandora_solr_custom');
+  
+  $message = t("Islandora Solr Custom <a href ='!link'>configuration page</a>.", array('!link' => 'admin/settings/islandora_solr_search/custom'));
+  drupal_set_message($message);
 }
 
 /**
@@ -27,34 +30,38 @@ function islandora_solr_custom_uninstall() {
 function islandora_solr_custom_schema() {
 
 $schema['islandora_solr_custom'] = array(
-  'description' => t('Solr search results template settings.'),
+  'description' => t('TODO: please describe this table!'),
   'fields' => array(
     'field' => array(
-      'description' => t('The solr field name.'),
+      'description' => t('TODO: please describe this field!'),
       'type' => 'varchar',
       'length' => '256',
       'not null' => TRUE,
     ),
     'label' => array(
-      'description' => t('Optionally overwrite the label for the field.'),
+      'description' => t('TODO: please describe this field!'),
       'type' => 'varchar',
       'length' => '256',
       'not null' => TRUE,
     ),
     'exclude_label' => array(
-      'description' => t('Checkbox value: exclude the label from display.'),
+      'description' => t('TODO: please describe this field!'),
       'type' => 'int',
       'not null' => TRUE,
     ),
     'markup' => array(
-      'description' => t('Checkbox value: show markup even when there is no search result for the field.'),
+      'description' => t('TODO: please describe this field!'),
+      'type' => 'int',
+      'not null' => TRUE,
+    ),
+    'position' => array(
+      'description' => t('TODO: please describe this field!'),
       'type' => 'int',
       'not null' => TRUE,
     ),
   ),
   'primary key' => array('field'),
 );
-
 
 return $schema;
 }

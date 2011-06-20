@@ -277,62 +277,72 @@ function islandora_solr_custom_settings_form_submit($form, &$form_state) {
  * @TODO add a solution/notification if it can't connect to solrconfig.xml correctly
  */
  
-function _islandora_solr_custom_db_values($check) {
+function _islandora_solr_custom_db_values($check = FALSE) {
 
-// This selects all rows in the order of the database:
-//  $sql = "SELECT * FROM {islandora_solr_custom}";
-//	$res = db_query($sql);
-//  while($db_array = db_fetch_array($res)) {
-//    $item[] = $db_array;
-//  }
-  
- 
-  
-  // check if the DB table is empty or not
-  $count = db_query("SELECT count(*) FROM {islandora_solr_custom}");
-  $count_result = db_result($count);
-  
-  // retrieve all information from the DB table and output them in the order as defined in solrconfig.xml
+  // set $item variable
   $item = array();
-  $solrconfig = _islandora_solr_custom_solrconfig();
-  foreach ( $solrconfig as $field) {
-    $res = db_query("SELECT * FROM {islandora_solr_custom} WHERE field = '%s'", $field);
-    $row_result = db_fetch_array($res);
-    
-    // if the field is not in the DB, add it using default settings and fetch it again.
-    if (!is_array($row_result) AND $check == TRUE) {
-      // add it to the DB
-      db_query("INSERT INTO {islandora_solr_custom} (field, label, exclude_label, markup) VALUES('%s', '%s', %d, %d)", $field, $field, 0, 1);
-      // and fetch it again
+  
+  // on admin page, get DB info and update (add/delete/position) according to solrconfig.xml
+  if ($check == TRUE) {
+  
+    // retrieve all information from the DB table and output them in the order as defined in solrconfig.xml
+    $item = array();
+    $solrconfig = _islandora_solr_custom_solrconfig();
+    $pos_count = 0;
+    foreach ( $solrconfig as $field) {
       $res = db_query("SELECT * FROM {islandora_solr_custom} WHERE field = '%s'", $field);
       $row_result = db_fetch_array($res);
-      $row_result['new'] = TRUE; // if the row just got added now, add a 'new' value. This will be put in a hidden field. This is needed so when saving table results while there are new fields added, the results will be saved, but no values would be set yet. This would override the default values set in this function with empty values.
-    }
-
-    $item[] = $row_result;
     
-  }
+      // if the field is not in the DB, add it using default settings and fetch it again.
+      if (!is_array($row_result)) {
+        // add it to the DB
+        db_query("INSERT INTO {islandora_solr_custom} (field, label, exclude_label, markup) VALUES('%s', '%s', %d, %d)", $field, $field, 0, 1);
+        // and fetch it again
+        $res = db_query("SELECT * FROM {islandora_solr_custom} WHERE field = '%s'", $field);
+        $row_result = db_fetch_array($res);
+        $row_result['new'] = TRUE; // if the row just got added now, add a 'new' value. This will be put in a hidden field. This is needed so when saving table results while there are new fields added, the results will be saved, but no values would be set yet. This would override the default values set in this function with empty values.
+      }
+    
+      // update the order of the fields in the DB.
+      db_query("UPDATE {islandora_solr_custom} SET position = %d WHERE field = '%s'", $pos_count, $field);
+      $pos_count++;
+    
+      // save in array
+      $item[] = $row_result;
+    
+    }
    
-   
-  // clean up rows that are not in the $solrconfig results
-  if ($check == TRUE) {
-    $sql = "SELECT * FROM {islandora_solr_custom}";
-    $res = db_query($sql);
+    // clean up rows that are not in the $solrconfig results
+    $res = db_query("SELECT * FROM {islandora_solr_custom}");
     while ($db_array = db_fetch_array($res)) {
       if (!in_array($db_array['field'], $solrconfig)) {
-    
+
         $field = $db_array['field'];
         db_query("DELETE FROM {islandora_solr_custom} WHERE field = '%s'", $field);
         drupal_set_message( t("@field is not defined in solrconfig.xml and is removed.", array('@field' => $field)) );
       }
     }
-    //dsm($db_array);
+  }
+  else {
+    // just get the data from the DB on normal search requests.
+    
+    // This selects all rows in the order of the database:
+	  $res = db_query("SELECT * FROM {islandora_solr_custom} ORDER BY position");
+    while($db_array = db_fetch_array($res)) {
+      $item[] = $db_array;
+    }
   }
    
    
-  
-  //dsm($item);
-
+   
+  // check if the DB table is empty or not
+  $count = db_query("SELECT count(*) FROM {islandora_solr_custom}");
+  $count_result = db_result($count);
+  if ($count_result == 0 AND user_access("access administration pages")) {
+    $message = t("There are no fields set to display. Please check the settings on the Islandora Solr Custom <a href ='!link'>configuration page</a>.", array('!link' => '/admin/settings/islandora_solr_search/custom'));
+    drupal_set_message($message, 'alert');
+  }
+   
   return $item;
 }
 
