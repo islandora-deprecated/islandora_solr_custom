@@ -20,6 +20,22 @@ function islandora_solr_custom_install() {
 function islandora_solr_custom_uninstall() {
 
   drupal_uninstall_schema('islandora_solr_custom');
+  
+  // removing variables
+  $variables = array(
+    'islandora_solr_custom_css',
+    'islandora_solr_custom_display',
+    'islandora_solr_custom_fields',
+    'islandora_solr_custom_style',
+    'islandora_solr_custom_switch',
+    'islandora_solr_custom_table',
+  );
+  foreach ($variables as $variable) {
+    variable_del($variable);
+  }
+
+  
+  
 }
 
 /**
