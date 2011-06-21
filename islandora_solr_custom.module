@@ -14,8 +14,9 @@ function islandora_solr_custom_init() {
   // adds css. I should look for an alternative place to load this because hook_init() will load this on every page.
   drupal_add_css(drupal_get_path('module', 'islandora_solr_custom') .'/css/islandora_solr_custom.css');
 
-  // add the .inc file
+  // add the .inc files
   module_load_include('inc', 'islandora_solr_custom', 'islandora_solr_custom.admin');
+  //module_load_include('inc', 'islandora_solr_custom', 'includes/IslandoraSolrResultsCSVcustom');
 }
 
 
@@ -123,5 +124,22 @@ function islandora_solr_custom_islandora_solr_primary_display() {
   );
 }
 
+
+/**
+ * Implements hook_islandora_solr_secondary_display()
+ */
+function islandora_solr_custom_islandora_solr_secondary_display() {
+  return array(
+    'csv_custom' => array(
+      'name' => t('CSV custom'),
+      'module' => 'islandora_solr_custom',
+      'file' => '/includes/IslandoraSolrResultsCSVcustom.inc',
+      'class' => 'IslandoraSolrResultsCSVcustom',
+      'function' => 'printCSV',
+      'description' => 'Download complete resultset as a CSV Spreadsheet',
+      'logo' => '<img src="http://www.stdicon.com/crystal/application/vnd.ms-excel?size=32" class="islandora_solr_secondary_display_icon">',
+    ),
+  );
+}
 
 
