@@ -90,7 +90,7 @@ class IslandoraSolrResultsCSVcustom extends IslandoraSolrResults {
         fputs( $docfile, addcslashes( serialize($doc), "\n\r\\" )."\n");
         
         foreach ($db_variables as $key => $field) {
-          $field_name = $field['field'];
+          $field_name = ($field['label'] != '' ? $field['label'] : $field['field']);
           $value = $doc[$field_name];
         
         
