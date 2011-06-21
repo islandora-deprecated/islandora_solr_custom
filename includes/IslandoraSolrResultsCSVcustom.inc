@@ -56,6 +56,10 @@ class IslandoraSolrResultsCSVcustom extends IslandoraSolrResults {
     $solrQueryProcessor->solrLimit = $increment;
 
     $docfile = tmpfile();
+    
+    // DB variables
+    $db_variables = _islandora_solr_custom_db_values($check = FALSE);
+    //dsm($db_variables);
 
     while( $solrQueryProcessor->solrStart < $upperLimit ) {
 
@@ -76,33 +80,40 @@ class IslandoraSolrResultsCSVcustom extends IslandoraSolrResults {
       $rawResponse = $solrQueryProcessor->solrResult->getRawResponse();
       $responseData = json_decode($rawResponse,true); // true == associative array, not object
       unset($rawResponse); // unknown usefulness
-
+      
       $docs = $responseData['response']['docs'];
-
+      //dsm($docs);
       // This loop is just to update the maximum value counts for each field
       // because if any field in the entire resultset has multiple values,
       // we must break the field into multiple iterated fields.
       foreach($docs as $doc) {
         fputs( $docfile, addcslashes( serialize($doc), "\n\r\\" )."\n");
-        foreach($doc as $field => $value) {
-
+        
+        foreach ($db_variables as $key => $field) {
+          $field_name = $field['field'];
+          $value = $doc[$field_name];
+        
+        
           $field_count = is_array($value) ? count($value) : 1;
 
-          if( !isset( $field_counts[$field] )) {
-            $field_counts[$field] = $field_count;
+          if( !isset( $field_counts[$field_name] )) {
+            $field_counts[$field_name] = $field_count;
           }
           else {
-            $field_counts[$field] = max($field_counts[$field], $field_count);
+            $field_counts[$field_name] = max($field_counts[$field_name], $field_count);
           }
 
           unset($value);
-          unset($field);
+          unset($field_name);
+        
         }
+        
         $row_count++;
         unset($doc); // unknown usefulness
         // I have read that PHP sometimes retains loop variables out of scope,
         // so I'm manually unsetting them with each iteration.
       }
+      //dsm($field_counts);
       unset($docs);
       unset($responseData); // unknown usefulness
 
@@ -132,12 +143,14 @@ class IslandoraSolrResultsCSVcustom extends IslandoraSolrResults {
         }
       }
     }
-
+    //dsm($header);
+    //dsm($docfile);
     // Generate refactored output matrix.
     $row_count = 0;
     while( $line = fgets( $docfile )) {
       $doc = unserialize( stripcslashes( $line ));
-      foreach( $field_counts as $field=>$count ) {
+      //dsm($doc);
+      foreach( $field_counts as $field => $count ) {
         $i = 0;
         while( $i < $count ) {
           if( isset( $doc[$field] )) {
@@ -160,6 +173,8 @@ class IslandoraSolrResultsCSVcustom extends IslandoraSolrResults {
       $row_count++;
     }
 
+
+    //dsm($rows);
     drupal_set_header('Content-Type: text/csv');
     drupal_set_header('Content-Disposition: attachment; filename="searchresults.csv"');
 
