@@ -355,6 +355,99 @@ function _islandora_solr_custom_db_values($check = FALSE) {
 
 
 
+
+
+
+/**
+ * Function to render the custom markup
+ * @return uses the given solr fields to render sample code to copy into islandora_solr_custom.tpl.php
+ */
+ 
+function _islandora_solr_custom_markup_render($markup) {
+
+  $output = '';
+  
+  $output .= '<div class="form-item">';
+  $output .= '<pre>';
+  $output .= _islandora_solr_custom_markup_div($markup);
+  $output .= '</pre>';
+  $output .= '</div>'; 
+  return $output;
+}
+
+/**
+ * Function to render the div markup
+ * @return div markup
+ */
+ 
+function _islandora_solr_custom_markup_div($markup) {
+
+  // split $markup into arrays
+  // $markup = nl2br($markup);
+  //$markup = explode("\r\n", $markup);
+  // $markup = str_replace("\r\n", '', $markup);
+  
+  // set $output variable
+  $output = '';
+  
+  $output .= '<?php
+
+/**
+ * @file islandora_solr_custom.tpl.php
+ * Islandora solr search results template
+ *
+ * Variables available:
+ * - $variables: all array elements of $variables can be used as a variable. e.g. $base_url equals $variables[\'base_url\']
+ * - $base_url: The base url of the current website. eg: http://example.com .
+ * - $user: The user object.
+ *
+ * - $style: the style of the display (\'div\' or \'table\'). Set in admin page by default. Overridden by the query value: ?display=foo
+ * - $results: the array containing the solr search results
+ * - $table_rendered: If the display style is set to \'table\', this will contain the rendered table.
+ *    For theme overriding, see: theme_islandora_solr_custom_table() 
+ * - $switch_rendered: The rendered switch to toggle between display styles
+ *    For theme overriding, see: theme_islandora_solr_custom_switch() 
+ *
+ */
+?>
+
+<?php print $switch_rendered; ?>
+
+<?php if ($style == \'div\'): ?>
+
+<ul class="islandora_solr_results">
+<?php foreach ($results as $id => $result): ?>
+  <li class="islandora_solr_result">
+  ';
+  
+  foreach ($markup as $field) {
+  
+  $output .= '  <div class="solr-field <?php print $result[\'' . $field . '\'][\'class\']; ?>">  
+      <div class="label"><label><?php print t($result[\'' . $field . '\'][\'label\']); ?></label></div>
+      <div class="value"><?php print $result[\'' . $field . '\'][\'value\']; ?></div>
+    </div>
+  ';
+  }
+  
+  $output .= '</li>
+<?php endforeach; ?>
+</ul>
+
+<?php elseif ($style == \'table\'): ?>
+
+  <?php print $table_rendered; ?>
+
+<?php endif;';
+
+  return check_plain($output);
+}
+
+
+
+
+
+
+
 /**
  * Function that connects to solrconfig.xml
  * @return an array that contains all the solr fields that are set in solrconfig.xml in <str name="fl"> ... </str>
