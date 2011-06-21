@@ -115,7 +115,7 @@ class IslandoraSolrResultsRSS extends IslandoraSolrResults {
     
     $output = theme('islandora_solr_custom_rss', $channel, $item);
     
-    return $output;
+    //return $output;
   }
 
 }
