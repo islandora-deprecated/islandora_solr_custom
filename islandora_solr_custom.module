@@ -93,6 +93,11 @@ function islandora_solr_custom_theme() {
       'file' => $file,
       'arguments' => array('db_values' => NULL, 'results' => NULL),
     ),
+    'islandora_solr_custom_rss' => array(
+      'path' => $path,
+      'file' => $file,
+      'arguments' => array('channel' => NULL, 'item' => NULL),
+    ),
   );
 }
  
@@ -116,7 +121,7 @@ function islandora_solr_custom_islandora_solr_primary_display() {
     'custom' => array(
       'name' => t('Custom'),
       'module' => 'islandora_solr_custom',
-      'file' => 'IslandoraSolrResultsCustom.inc',
+      'file' => '/includes/IslandoraSolrResultsCustom.inc',
       'class' => "IslandoraSolrResultsCustom",
       'function' => "displayResults",
       'description' => t("Take full controll over the markup of the Solr results."),
@@ -138,6 +143,15 @@ function islandora_solr_custom_islandora_solr_secondary_display() {
       'function' => 'printCSV',
       'description' => 'Download complete resultset as a CSV Spreadsheet',
       'logo' => '<img src="http://www.stdicon.com/crystal/application/vnd.ms-excel?size=32" class="islandora_solr_secondary_display_icon">',
+    ),
+    'rss' => array(
+      'name' => t('RSS'),
+      'module' => 'islandora_solr_custom',
+      'file' => '/includes/IslandoraSolrResultsRSS.inc',
+      'class' => 'IslandoraSolrResultsRSS',
+      'function' => 'printRSS',
+      'description' => 'Parse a complete resultset as an RSS feed',
+      'logo' => '<img src="http://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/18px-Feed-icon.svg.png" class="islandora_solr_secondary_display_icon">',
     ),
   );
 }

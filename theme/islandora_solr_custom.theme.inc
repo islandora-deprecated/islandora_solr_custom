@@ -248,3 +248,36 @@ function theme_islandora_solr_custom_table($db_values, $results) {
 
   return $output;
 }
+
+
+
+
+/**
+ * Theme function for theming the RSS secondary display.
+ *
+ * @return rendered RSS display
+ */
+
+function theme_islandora_solr_custom_rss($channel, $item) {
+
+  drupal_set_header('Content-Type: application/rss+xml; charset=utf-8');
+
+  $items = '';
+  foreach ($item as $feed) {
+    dsm($feed);
+    $items .= format_rss_item($feed['title'], $feed['link'], $feed['description'], $feed['items']);
+  }
+  dsm($items);
+  $site_name = variable_get('site_name', 'Drupal');
+  $url = url((isset($category) ? 'aggregator/categories/' . $category->cid : 'aggregator'), array('absolute' => TRUE));
+  $description = isset($category) ? t('@site_name - aggregated feeds in category @title', array('@site_name' => $site_name, '@title' => $category->title)) : t('@site_name - aggregated feeds', array('@site_name' => $site_name));
+
+  $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+  $output .= "<rss version=\"2.0\">\n";
+  $output .= format_rss_channel(t('@site_name aggregator', array('@site_name' => $site_name)), $url, $description, $items);
+  $output .= "</rss>\n";
+
+  print $output;
+
+  
+}
