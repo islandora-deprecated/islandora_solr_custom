@@ -12,6 +12,10 @@ Reminders:
 
 * required
 x useful
+o not going to use
+F Fixed value
+
+
 Key - Value - Arguments
 
 Ability to create customized feeds. ?display=rss&feed=custom
@@ -28,40 +32,40 @@ display on each page?
 
 Channel
 =======
-x * title:          value
-x * link:           value
-x * description:    value
-x   language        value
-x   copyright       value
-x   managingEditor  value
-x   webMaster       value
-x   pubDate         value
-    lastBuildDate   value
-x   category        value - attributes (1) - multiple
-    generator       value
-    docs            value
-    cloud                 - attributes (5)
-    ttl             value
-x   image                 - sub-elements (3)
-x   textInput             - sub-elements (4)
-    skipHours             - sub-elements (x)
-    skipDays              - sub-elements (x)
+x * title:          value                                 --textfield
+x * link:           value                                 --textfield
+x * description:    value                                 --textfield -> 'Displays solr search results of: foo, bar'
+x   language        value                                 --textfield --link to format: http://www.w3.org/TR/REC-html40/struct/dirlang.html#langcodes
+x   copyright       value                                 --textfield
+x   managingEditor  value                                 --textfield (email)
+x   webMaster       value                                 --textfield (email)
+o   pubDate         value
+o   lastBuildDate   value
+x   category        value - attributes (1) - multiple     --textfield
+o   generator       value 
+F   docs            value http://cyber.law.harvard.edu/rss/rss.html
+o   cloud                 - attributes (5)
+o   ttl             value
+x   image                 - sub-elements (3)              --default site logo or custom upload
+o   textInput             - sub-elements (4) = search bar. not really possible to combine with islandora solr search.
+o   skipHours             - sub-elements (x)
+o   skipDays              - sub-elements (x)
 
 
 
 
 Item
 ====
-x * title:        value
-x * link:         value
-x * description:  value
-x   author:       value
-x   guid:         value - attributes (1)
-x   enclosure:            attributes (3) - multiple
-x   pubDate:      value
-x   category:     value - attributes (1) - multiple
-x   comments:     value
-x   source:       value - attributes (1)
+x * title        value                            --field dropdown (default: dc.title)
+F * link         value                            --base url + object url + PID
+x * description  value                            --field dropdown (default: dc.description)
+x   author       value                            --field dropdown (default: dc.author)
+F   guid         value - attributes (1)              --value: fixed (PID) attributes: fixed ('isPermaLink' => 'false')
+x   enclosure            attributes (3) - multiple   --textfield (2) dropdown for file types
+x   pubDate      value                                --field dropdown (default:fgs.createdDate)
+x   category     value - attributes (1) - multiple    --field dropdown --attributes: field dropdown (default:dc.subject)
+x   comments     value                                --textfield
+x   source       value - attributes (1)               --field dropdown (2)
 
         $result['title']       = $doc['dc.title'];
         $result['link']        = $base_url . '/fedora/repository/' . htmlspecialchars($doc['PID'], ENT_QUOTES, 'utf-8');

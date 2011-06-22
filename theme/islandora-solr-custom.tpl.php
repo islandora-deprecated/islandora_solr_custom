@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file islandora_solr_custom.tpl.php
+ * @file islandora-solr-custom.tpl.php
  * Islandora solr search results template
  *
  * Variables available:

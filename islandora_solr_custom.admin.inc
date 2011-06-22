@@ -156,7 +156,7 @@ function islandora_solr_custom_admin_settings() {
     '#title' => t('Custom markup'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
-    '#description' =>   '<p>' . t('In your theme create a template file called <strong>islandora_solr_custom.tpl.php</strong> and paste in the code below. This will give you a nice start to customize your solr search results. You can then add wrapper elements, change labels, generate images from the repository, etc. Don\'t forget to rebuild the theme registry after doing this.') . '</p>' . 
+    '#description' =>   '<p>' . t('In your theme create a template file called <strong>islandora-solr-custom.tpl.php</strong> and paste in the code below. This will give you a nice start to customize your solr search results. You can then add wrapper elements, change labels, generate images from the repository, etc. Don\'t forget to rebuild the theme registry after doing this.') . '</p>' . 
                         '<p>' . t("Label overrides provided by the table above are applied, but label exclusion and showing markup when empty are not. Goal is for you to take full control over the output. It is also possible to override the theme functions of the table display and the switch link.") . '</p>' .
                         '<p>' . _islandora_solr_custom_template_overwrite() . '</p>',
   );
@@ -276,7 +276,7 @@ function islandora_solr_custom_settings_form_submit($form, &$form_state) {
 
 /**
  * Function to render the custom markup
- * @return uses the given solr fields to render sample code to copy into islandora_solr_custom.tpl.php
+ * @return uses the given solr fields to render sample code to copy into islandora-solr-custom.tpl.php
  */
  
 function _islandora_solr_custom_markup_render($markup) {
@@ -309,7 +309,7 @@ function _islandora_solr_custom_markup_div($markup) {
   $output .= '<?php
 
 /**
- * @file islandora_solr_custom.tpl.php
+ * @file islandora-solr-custom.tpl.php
  * Islandora solr search results template
  *
  * Variables available:
@@ -503,7 +503,7 @@ function _islandora_solr_custom_solrconfig() {
 
 /**
  *  Function that looks for all template files that overwrite the module's
- *  islandora_solr_custom.tpl.php.
+ *  islandora-solr-custom.tpl.php.
  *  @return if results are found, returns a table with theme name and path.
  */
  
@@ -526,13 +526,13 @@ function _islandora_solr_custom_template_overwrite() {
     
     $message = '';
     if (empty($overwritten)) {
-      $message .= t('islandora_solr_custom.tpl.php has not been overwritten yet.');
+      $message .= t('islandora-solr-custom.tpl.php has not been overwritten yet.');
     }
     else {
-      $message .= t('islandora_solr_custom.tpl.php has been overwritten in the following location(s):');
+      $message .= t('islandora-solr-custom.tpl.php has been overwritten in the following location(s):');
       foreach ($overwritten as $theme) {
         $row['name'] = $theme['name'];
-        $row['path'] = $theme['path'] . '/islandora_solr_custom.tpl.php';
+        $row['path'] = $theme['path'] . '/islandora-solr-custom.tpl.php';
         $rows[] = $row;
       }
             

@@ -75,7 +75,7 @@ function islandora_solr_custom_theme() {
     'islandora_solr_custom' => array(
       'path' => $path,
       'file' => $file,
-      'template' => 'islandora_solr_custom',
+      'template' => 'islandora-solr-custom',
       'arguments' => array('results_raw' => NULL),
     ),
     'islandora_solr_custom_admin_settings' => array(
