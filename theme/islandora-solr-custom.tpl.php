@@ -19,7 +19,7 @@
  */
 ?>
 
-<?php print $switch_rendered; ?>
+<?php print $switch_rendered;  dsm($variables);?>
 
 <?php if ($style == 'div'): ?>
 

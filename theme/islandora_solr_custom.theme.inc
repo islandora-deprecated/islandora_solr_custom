@@ -191,6 +191,7 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
     $variables['switch_rendered'] = theme('islandora_solr_custom_switch', $curr_url);
   
   }
+  //$variables['template_file'] = 'islandora-solr-custom-test';
 }
 
 
@@ -268,6 +269,10 @@ function theme_islandora_solr_custom_rss($channel, $item) {
     $items .= format_rss_item($feed['title'], $feed['link'], $feed['description'], $feed['items']);
   }
   dsm($items);
+  
+  
+  
+  
   $site_name = variable_get('site_name', 'Drupal');
   $url = url((isset($category) ? 'aggregator/categories/' . $category->cid : 'aggregator'), array('absolute' => TRUE));
   $description = isset($category) ? t('@site_name - aggregated feeds in category @title', array('@site_name' => $site_name, '@title' => $category->title)) : t('@site_name - aggregated feeds', array('@site_name' => $site_name));

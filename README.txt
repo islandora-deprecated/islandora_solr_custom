@@ -10,11 +10,12 @@ or you can take full control by overriding the template file.
 Reminders:
 ==========
 
-* required
-x useful
-o not going to use
-F Fixed value
-
+* = required
+x = useful
+o = not going to use
+F = Fixed value
+B = Basic settings
+A = Advanced settings
 
 Key - Value - Arguments
 
@@ -32,21 +33,21 @@ display on each page?
 
 Channel
 =======
-x * title:          value                                 --textfield
-x * link:           value                                 --textfield
-x * description:    value                                 --textfield -> 'Displays solr search results of: foo, bar'
-x   language        value                                 --textfield --link to format: http://www.w3.org/TR/REC-html40/struct/dirlang.html#langcodes
-x   copyright       value                                 --textfield
-x   managingEditor  value                                 --textfield (email)
-x   webMaster       value                                 --textfield (email)
+B x * title:          value                                 --textfield
+B x * link:           value                                 --textfield
+B x * description:    value                                 --textfield -> 'Displays solr search results of: foo, bar'
+A x   language        value                                 --textfield --link to format: http://www.w3.org/TR/REC-html40/struct/dirlang.html#langcodes
+B F   docs            value http://cyber.law.harvard.edu/rss/rss.html
+B x   image                 - sub-elements (3)              --default site logo or custom upload
+A x   copyright       value                                 --textfield
+A x   managingEditor  value                                 --textfield (email)
+A x   webMaster       value                                 --textfield (email)
+A x   category        value - attributes (1) - multiple     --textfield
 o   pubDate         value
 o   lastBuildDate   value
-x   category        value - attributes (1) - multiple     --textfield
 o   generator       value 
-F   docs            value http://cyber.law.harvard.edu/rss/rss.html
 o   cloud                 - attributes (5)
 o   ttl             value
-x   image                 - sub-elements (3)              --default site logo or custom upload
 o   textInput             - sub-elements (4) = search bar. not really possible to combine with islandora solr search.
 o   skipHours             - sub-elements (x)
 o   skipDays              - sub-elements (x)
@@ -56,16 +57,16 @@ o   skipDays              - sub-elements (x)
 
 Item
 ====
-x * title        value                            --field dropdown (default: dc.title)
-F * link         value                            --base url + object url + PID
-x * description  value                            --field dropdown (default: dc.description)
-x   author       value                            --field dropdown (default: dc.author)
-F   guid         value - attributes (1)              --value: fixed (PID) attributes: fixed ('isPermaLink' => 'false')
-x   enclosure            attributes (3) - multiple   --textfield (2) dropdown for file types
-x   pubDate      value                                --field dropdown (default:fgs.createdDate)
-x   category     value - attributes (1) - multiple    --field dropdown --attributes: field dropdown (default:dc.subject)
-x   comments     value                                --textfield
-x   source       value - attributes (1)               --field dropdown (2)
+B x * title        value                            --field dropdown (default: dc.title)
+B F * link         value                            --base url + object url + PID
+B x * description  value                            --field dropdown (default: dc.description)
+B F   guid         value - attributes (1)              --value: fixed (PID) attributes: fixed ('isPermaLink' => 'false')
+B x   enclosure            attributes (3) - multiple   --textfield (2) dropdown for file types
+A x   author       value                            --field dropdown (default: dc.author)
+A x   pubDate      value                                --field dropdown (default:fgs.createdDate)
+A x   category     value - attributes (1) - multiple    --field dropdown --attributes: field dropdown (default:dc.subject)
+A x   comments     value                                --textfield
+A x   source       value - attributes (1)               --field dropdown (2)
 
         $result['title']       = $doc['dc.title'];
         $result['link']        = $base_url . '/fedora/repository/' . htmlspecialchars($doc['PID'], ENT_QUOTES, 'utf-8');

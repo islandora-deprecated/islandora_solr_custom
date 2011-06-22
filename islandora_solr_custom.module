@@ -96,6 +96,7 @@ function islandora_solr_custom_theme() {
     'islandora_solr_custom_rss' => array(
       'path' => $path,
       'file' => $file,
+      'template' => 'islandora-solr-custom-rss',
       'arguments' => array('channel' => NULL, 'item' => NULL),
     ),
   );
