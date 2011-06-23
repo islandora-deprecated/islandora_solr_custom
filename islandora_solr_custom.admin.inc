@@ -356,6 +356,8 @@ function _islandora_solr_custom_markup_div($markup) {
 <?php if ($style == \'div\'): ?>
 
 <ul class="islandora_solr_results">
+<?php if ($results == \'\'): print \'<p>\' . t(\'Your search yielded no results\') . \'</p>\'; ?>
+<?php else: ?>
 <?php foreach ($results as $id => $result): ?>
   <li class="islandora_solr_result">
   ';
@@ -371,6 +373,7 @@ function _islandora_solr_custom_markup_div($markup) {
   
   $output .= '</li>
 <?php endforeach; ?>
+<?php endif; ?>
 </ul>
 
 <?php elseif ($style == \'table\'): ?>
