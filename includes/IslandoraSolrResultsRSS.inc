@@ -35,7 +35,7 @@ class IslandoraSolrResultsRSS extends IslandoraSolrResults {
     // solrStart=40, solrLimit=60.
 
     global $base_url;
-
+    
     // First off, update outer limits
     $upperLimit = $solrQueryProcessor->solrResult->response->numFound;
     $lowerLimit = 0;
@@ -74,48 +74,65 @@ class IslandoraSolrResultsRSS extends IslandoraSolrResults {
       // else ...
       $rawResponse = $solrQueryProcessor->solrResult->getRawResponse();
       $responseData = json_decode($rawResponse,true); // true == associative array, not object
+      dsm($responsedata);
       unset($rawResponse); // unknown usefulness
       
       $docs = $responseData['response']['docs'];
-      dsm($docs);
+      //dsm($docs);
 
 
     }
 
-    $results = array();
     
-    foreach ($docs as $key => $doc) {
-      
-        //dsm($doc);
-        foreach ($doc as $key => $value) {
-          if (is_array($value) AND count($value == 1 )) {
-            $doc[$key] = $value[0];
-          }
-        }
-      
-        $result['title']       = $doc['dc.title'];
-        $result['link']        = $base_url . '/fedora/repository/' . htmlspecialchars($doc['PID'], ENT_QUOTES, 'utf-8');
-        $result['description'] = $doc['dc.description'];
-        $result['items'][]     = array('key' => 'author', 'value' => $doc['dc.creator']);   
-        $result['items'][]     = array('key' => 'guid', 'value' => $doc['PID'], 'attributes' => array('isPermaLink' => 'false',));   // <guid isPermaLink="true">http://inessential.com/2002/09/01.php#a2</guid>
-        $result['items'][]     = array('key' => 'enclosure', 'value' => '', 'attributes' => array('url' => 'http://upload.wikimedia.org/wikipedia/commons/7/7a/Basketball.png', 'length' => '1234', 'type' => 'image/png')); // enclosure 	Describes a media object that is attached to the item. More. 	<enclosure url="http://live.curry.com/mp3/celebritySCms.mp3" length="1069871" type="audio/mpeg"/>
-        $result['items'][]     = array('key' => 'pubDate', 'value' => $doc['fgs.createdDate']);   
-        $result['items'][]     = array('key' => 'category', 'value' => $doc['dc.subject']);
-        $result['items'][]     = array('key' => 'comments', 'value' => '');
-        $result['items'][]     = array('key' => 'source', 'value' => ''); 
-     
-      
+    
+  // this is where we switch to rss view
+  drupal_set_header('Content-Type: application/rss+xml; charset=utf-8');
+  
+  // set variables
+  $result = array();
+  $item = array();
+  
+  // render the rss <item> elements
+  foreach ($docs as $key => $doc) {
+    // render single search results
+    foreach ($doc as $key => $value) {
+      // some values are located in a single array. Revert this:
+      if (is_array($value) AND count($value == 1 )) {
+        $doc[$key] = $value[0];
+      }
+    }
+    
+    // all the variables for the <item> elements are set in this theme function.
+    $result = theme('islandora_solr_custom_rss_item', $doc);
+    
     $item[] = $result;
-    }
+  }
+  
 
-    $channel = array();
+  $items = '';
+  foreach ($item as $feed) {
+    $items .= format_rss_item($feed['title'], $feed['link'], $feed['description'], $feed['items']);
+  }
+  
+  // query search terms:
+  $query = $solrQueryProcessor->solrQuery;
+  
+  // get the variables for the <channel> element
+  $channel = theme('islandora_solr_custom_rss_channel', $query);
+  
+  // give the results clean variable names.
+  $title = $channel['title'];
+  $url = $channel['url'];
+  $description = $channel['description'];
+  $langcode = $channel['langcode'];
+  $args = $channel['args'];
 
-    dsm($item);
-    //dsm($rows);
-    
-    $output = theme('islandora_solr_custom_rss', $channel, $item);
-    
-    //return $output;
+  $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+  $output .= "<rss version=\"2.0\">\n";
+  $output .= format_rss_channel( $title, $url, $description, $items, $langcode, $args);
+  $output .= "</rss>\n";
+
+  print $output;
   }
 
 }

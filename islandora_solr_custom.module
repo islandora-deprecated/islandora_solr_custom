@@ -93,11 +93,15 @@ function islandora_solr_custom_theme() {
       'file' => $file,
       'arguments' => array('db_values' => NULL, 'results' => NULL),
     ),
-    'islandora_solr_custom_rss' => array(
+    'islandora_solr_custom_rss_item' => array(
       'path' => $path,
       'file' => $file,
-      'template' => 'islandora-solr-custom-rss',
-      'arguments' => array('channel' => NULL, 'item' => NULL),
+      'arguments' => array('doc' => NULL),
+    ),
+    'islandora_solr_custom_rss_channel' => array(
+      'path' => $path,
+      'file' => $file,
+      'arguments' => array('query' => NULL),
     ),
   );
 }

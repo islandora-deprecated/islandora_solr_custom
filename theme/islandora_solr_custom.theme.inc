@@ -133,17 +133,13 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   
   // if 'display' is set to table, render the table.
   if ($variables['style'] == 'table') {
-    if ($variables['results'] != '') {
     
       $db_values = $variables['db_values'];
       $results = $variables['results'];
     
       $output = theme('islandora_solr_custom_table', $db_values, $results );
-    }
-    else {
-      $output = '<p>' . t('Your search yielded no results') . '</p>';
-    }
-    $variables['table_rendered'] = $output;
+
+      $variables['table_rendered'] = $output;
   }
   
   // if display switch is set, render the link
@@ -219,6 +215,12 @@ function theme_islandora_solr_custom_switch($curr_url) {
  
 function theme_islandora_solr_custom_table($db_values, $results) {
   $output = '';
+  
+  if ($results == '') {
+    $output = '<p>' . t('Your search yielded no results') . '</p>';
+  }
+  else {
+
     // Table headers.
     $header = array();
     foreach ($db_values as $key => $result) {
@@ -246,7 +248,7 @@ function theme_islandora_solr_custom_table($db_values, $results) {
     }
     
     $output = theme('table', $header, $rows);
-
+  }
   return $output;
 }
 
@@ -254,38 +256,47 @@ function theme_islandora_solr_custom_table($db_values, $results) {
 
 
 /**
- * Theme function for theming the RSS secondary display.
+ * Theme function for setting the values of the <item> elements for the RSS secondary display.
  *
- * @return rendered RSS display
+ * @return variable that holds all values to be rendered into <item> elements
  */
 
-function theme_islandora_solr_custom_rss($channel, $item) {
+function theme_islandora_solr_custom_rss_item($doc) {
 
-  drupal_set_header('Content-Type: application/rss+xml; charset=utf-8');
-
-  $items = '';
-  foreach ($item as $feed) {
-    dsm($feed);
-    $items .= format_rss_item($feed['title'], $feed['link'], $feed['description'], $feed['items']);
-  }
-  dsm($items);
-  
-  
-  
-  
-  $site_name = variable_get('site_name', 'Drupal');
-  $url = url((isset($category) ? 'aggregator/categories/' . $category->cid : 'aggregator'), array('absolute' => TRUE));
-  $description = isset($category) ? t('@site_name - aggregated feeds in category @title', array('@site_name' => $site_name, '@title' => $category->title)) : t('@site_name - aggregated feeds', array('@site_name' => $site_name));
-
-
-
-
-  $output = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-  $output .= "<rss version=\"2.0\">\n";
-  $output .= format_rss_channel(t('@site_name aggregator', array('@site_name' => $site_name)), $url, $description, $items);
-  $output .= "</rss>\n";
-
-  print $output;
-
-  
+  // set the variables to be rendered as elements in the <item> element
+  $result['title']       = $doc['dc.title'];
+  $result['link']        = $base_url . '/fedora/repository/' . htmlspecialchars($doc['PID'], ENT_QUOTES, 'utf-8');
+  $result['description'] = $doc['dc.description'];
+  $result['items']       = array(
+                             array('key' => 'author', 'value' => $doc['dc.creator']),
+                             array('key' => 'guid', 'value' => $doc['PID'], 'attributes' => array('isPermaLink' => 'false',)),   // <guid isPermaLink="true">http://inessential.com/2002/09/01.php#a2</guid>
+                             array('key' => 'enclosure', 'value' => '', 'attributes' => array('url' => 'http://upload.wikimedia.org/wikipedia/commons/7/7a/Basketball.png', 'length' => '1234', 'type' => 'image/png')), // enclosure     Describes a media object that is attached to the item. More. <enclosure url="http://live.curry.com/mp3/celebritySCms.mp3" length="1069871" type="audio/mpeg"/>
+                             array('key' => 'pubDate', 'value' => $doc['fgs.createdDate']),
+                             array('key' => 'category', 'value' => $doc['dc.subject']),
+                             array('key' => 'comments', 'value' => ''),
+                             array('key' => 'source', 'value' => ''),
+                           ); 
+return $result;
 }
+
+
+
+/**
+ * Theme function for setting the values of the <channel> elements for the RSS secondary display.
+ *
+ * @return variable that holds all values to be rendered into <channel> elements
+ */
+
+function theme_islandora_solr_custom_rss_channel($query) {
+  global $base_url;
+
+  // set the variables to be rendered as elements in the <channel> element
+  $result['title'] = t('@site_name aggregator', array('@site_name' => variable_get('site_name', 'Drupal')));
+  $result['url'] = $base_url;
+  $result['description'] = t('Aggregated search results of:') . ' ' . $query;
+  $result['langcode'] = NULL;
+  $result['args'] = array();
+
+return $result;
+}
+

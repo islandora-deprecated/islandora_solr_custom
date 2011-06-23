@@ -82,5 +82,63 @@ A x   source       value - attributes (1)               --field dropdown (2)
         
         
         
+This is how an rss template would look like. (roughly)
         
+<?php print "<?xml"; ?> version="1.0" encoding="utf-8" <?php print "?>"; ?>
+<rss version="2.0" xml:base="<?php print $link; ?>"<?php print $namespaces; ?>>
+  <channel>
+    <title><?php print $viewtitle; ?></title>
+    <description><?php print $description; ?></description>
+    <link><?php print $link ?></link>
+    
+    <language></language>
+    <copyright></copyright>
+    <managingEditor></managingEditor>
+    <webMaster></webMaster>
+    <pubDate></pubDate>
+    <lastBuildDate></lastBuildDate>
+    <category></category>
+    <generator></generator>
+    <docs></docs>
+    <cloud />
+    <ttl></ttl>
+    <image>
+      <url></url>
+      <title></title>
+      <link></link>
+      <width></width>
+      <height></height>
+      <description></description>
+    </image>
+    <textInput>
+      <title></title>
+      <description></description>
+      <name></name>
+      <link></link>
+    </textInput>
+    <skipHours>
+      <hour></hour>
+    </skipHours>
+    <skipDays>
+      <day></day>
+    </skipDays>
+    
+    <?php foreach ($whatever as $key => $value): ?>
+      <item>
+        <title><?php print $title; ?></title>
+        <link><?php print $link; ?></link>
+        <description><?php print $description; ?></description>
+        
+        <author></author>
+        <guid></guid>
+        <enclosure />
+        <pubDate></pubDate>
+        <category></category>
+        <comments></comments>
+        <source></source>
+      </item>
+    <?php endforeach; ?>
+  
+  </channel>
+</rss>
         
