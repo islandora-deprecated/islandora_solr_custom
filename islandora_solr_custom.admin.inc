@@ -26,12 +26,6 @@ function _islandora_solr_custom_debug() {
  
 function islandora_solr_custom_admin_settings() {
 
-
-    
-    
-
-
-
   $form = array();
   /* Disabled for now.
   $form['islandora_solr_custom_fields'] = array(
@@ -42,40 +36,10 @@ function islandora_solr_custom_admin_settings() {
   );
   */
   
-  $form['display_style'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Display style'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-    '#tree' => TRUE, // this attribute is important to return the submitted values in a deeper nested arrays in $form_state['values'] . See http://drupal.org/node/751826
-    '#description' => t('Configure the display style.'),
-    '#weight' => -1,
-  );
-  $form['display_style']['display'] = array(
-    '#type' => 'select',
-    '#title' => t('Default display style'),
-    '#default_value' => variable_get('islandora_solr_custom_display', 'div'),
-    '#options' => array(
-      'div' => t('Div'),
-      'table' => t('Table'),
-    ),
-    '#description' => t('Set the display style of the solr search results.'),
-    '#weight' => -10,
-  );
-  $form['display_style']['switch'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Add display switch link?'),
-    '#default_value' => variable_get('islandora_solr_custom_switch', 0),
-    '#description' => t('Check if you want to include a link to switch between the two display styles.'),
-  );
-  $form['display_style']['css'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Include css?'),
-    '#default_value' => variable_get('islandora_solr_custom_css', 1),
-    '#description' => t('Check if you want to include some basic css styling. You can still overwrite css in the theme layer. Only uncheck if you really want to take full control over the css styling. This will not affect the table display.'),
-  );
 
-  
+
+
+  // form: Field settings
   // create a new fieldset where we can put the rendered table in. Couldn't make that work with the actual fieldset of the table form items.  
   $form['islandora_solr_custom_table_output'] = array(
     '#type' => 'fieldset',
@@ -84,7 +48,7 @@ function islandora_solr_custom_admin_settings() {
     '#collapsed' => FALSE,
     '#tree' => FALSE, // not needed as this fieldset just outputs the rendered table.
     '#description' => t('Modify the field settings'),
-    '#weight' => -1,
+    '#weight' => -5,
   );
   $form['islandora_solr_custom_table_output']['table_output_markup'] = array(
     '#type' => 'markup',
@@ -138,6 +102,64 @@ function islandora_solr_custom_admin_settings() {
   
   }
   
+  
+  // form: Display style
+  $form['display_style'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Display style'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#tree' => TRUE, // this attribute is important to return the submitted values in a deeper nested arrays in $form_state['values'] . See http://drupal.org/node/751826
+    '#description' => t('Configure the display style.'),
+    '#weight' => -4,
+  );
+  $form['display_style']['display'] = array(
+    '#type' => 'select',
+    '#title' => t('Default display style'),
+    '#default_value' => variable_get('islandora_solr_custom_display', 'div'),
+    '#options' => array(
+      'div' => t('Div'),
+      'table' => t('Table'),
+    ),
+    '#description' => t('Set the display style of the solr search results.'),
+    '#weight' => -10,
+  );
+  $form['display_style']['switch'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Add display switch link?'),
+    '#default_value' => variable_get('islandora_solr_custom_switch', 0),
+    '#description' => t('Check if you want to include a link to switch between the two display styles.'),
+  );
+  $form['display_style']['css'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Include css?'),
+    '#default_value' => variable_get('islandora_solr_custom_css', 1),
+    '#description' => t('Check if you want to include some basic css styling. You can still overwrite css in the theme layer. Only uncheck if you really want to take full control over the css styling. This will not affect the table display.'),
+  );
+
+
+  // RSS settings
+  $form['rss'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('RSS'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#tree' => TRUE, // this attribute is important to return the submitted values in a deeper nested arrays in $form_state['values'] . See http://drupal.org/node/751826
+    '#description' => t('Configure the RSS settings.'),
+    '#weight' => -3,
+  );
+  $form['rss']['default_limit'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default RSS item limit'),
+    '#default_value' => variable_get('islandora_solr_custom_rss_limit', 25),
+    '#description' => t('The default limit of results to show in the RSS feed.'),
+    '#size' => 2,
+    '#maxlength' => 128,
+    '#required' => FALSE,
+  );
+  
+  
+  
   $form['buttons']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save and generate markup')
@@ -178,11 +200,12 @@ function islandora_solr_custom_admin_settings_validate($element, &$form_state) {
       //dsm($element);
       //dsm($form_state);
       
-      // I should add some validation rules here.
+      //dsm($element);
+      if (!is_numeric($element['rss']['default_limit']['#value'])) {
+        form_error(&$element['rss']['default_limit'], t('Default RSS limit must be a numeric value.'));
+      }
       
-      //if (empty($element['#value'])) {
-      //     form_error($element['#name'], t('This field is required.'));
-      //   }
+      //drupal_set_message(form_get_errors());
 }
 
 
@@ -231,7 +254,8 @@ function islandora_solr_custom_settings_form_submit($form, &$form_state) {
   // saving the css result
   variable_set('islandora_solr_custom_css', $form_state['values']['display_style']['css']);
   
-  
+  // saving the RSS limit result
+  variable_set('islandora_solr_custom_rss_limit', $form_state['values']['rss']['default_limit']);
   
   
   

@@ -74,7 +74,7 @@ class IslandoraSolrResultsRSS extends IslandoraSolrResults {
       // else ...
       $rawResponse = $solrQueryProcessor->solrResult->getRawResponse();
       $responseData = json_decode($rawResponse,true); // true == associative array, not object
-      dsm($responsedata);
+      //dsm($responsedata);
       unset($rawResponse); // unknown usefulness
       
       $docs = $responseData['response']['docs'];
@@ -83,7 +83,7 @@ class IslandoraSolrResultsRSS extends IslandoraSolrResults {
 
     }
 
-    
+
     
   // this is where we switch to rss view
   drupal_set_header('Content-Type: application/rss+xml; charset=utf-8');
@@ -92,11 +92,20 @@ class IslandoraSolrResultsRSS extends IslandoraSolrResults {
   $result = array();
   $item = array();
   
-  // render the rss <item> elements
+  // set limit to rss items.
+  $limit = variable_get('islandora_solr_custom_rss_limit', 25);
+  if (isset($_GET['limit'])) {
+    $limit = $_GET['limit'];
+  }
+  $docs = array_slice($docs, 0, $limit);
+  
+  //for ($i = 0; $i < $limit; $i++) {
+  // render the single rss <item> elements
   foreach ($docs as $key => $doc) {
-    // render single search results
+  
+    // some values are located in a single array. Revert this:
     foreach ($doc as $key => $value) {
-      // some values are located in a single array. Revert this:
+      
       if (is_array($value) AND count($value == 1 )) {
         $doc[$key] = $value[0];
       }
@@ -106,8 +115,9 @@ class IslandoraSolrResultsRSS extends IslandoraSolrResults {
     $result = theme('islandora_solr_custom_rss_item', $doc);
     
     $item[] = $result;
+    
   }
-  
+ // } 
 
   $items = '';
   foreach ($item as $feed) {
