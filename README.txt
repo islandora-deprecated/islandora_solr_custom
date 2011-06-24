@@ -57,7 +57,8 @@ provide this interface and I've worked lots with it. It's not too bad.
   - I'm wondering if the 'results per page' could be set per (primary) display. A
     table could take more results than a div based layout for example. This
     could also be added to the primary display table, maybe? Or would that get
-    too messy?
+    too messy? It could also go on a settings page for that display where it
+    can overwrite the default.
     
 
 
