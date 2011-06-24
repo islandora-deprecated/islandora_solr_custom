@@ -7,6 +7,64 @@ style of your search results by changing the settings in the admin section
 or you can take full control by overriding the template file.
 
 
+TODO
+====
+
+- get the reset functionality in the admin page fixed up.
+
+- RSS functionality works well, but could be better/fancier?. Right now if you 
+want to create settings for multiple different RSS feeds, you'll have to 
+overwrite a theme function and set new values to the variables using a 
+conditional statement of some sorts. There was the option to have it 'pluggable'
+trough a function in a module using module_invoke_all(), but you would have to
+write an entire module to set some values. Another option would be to make a 
+user interface for this, but to make this any powerful, it would require a 
+pretty complex module. We're dealing with multiple RSS elements like <enclosure>
+and <category>. Some items you might want to see conditional, for example add
+a different <enclosure> tag dependent on the Object type. This would require
+some php tweaking which is only possible in a theme file or module.
+
+Another option I might look into is in the admin interface, provide a textarea
+with some of the basic php code as default. Users can modify those settings, which 
+will be displayed in a list. It not really great working with php snippets in
+the admin interface, but popular modules like Display Suite and Custom Formatters
+provide this interface and I've worked lots with it. It's not too bad.
+
+- look into merging options with islandora_solr_search:
+
+  - I think the default display should provide a template file.
+  
+  - A table display could be default as well.
+  
+  - The primary display selection list could be a table with the following columns:
+    - checkboxes to enable multiple displays (enabled displays would get a switch
+      link. I don't see a scenario where you want to enable a display without
+      the ability to switch to it)
+    - radio buttons to specify one default display
+    
+  - I don't know about the functionality where you can overwrite labels etc.
+    It might be a bit too complex and I don't know how flexible it is. It works
+    for me, but I don't know how useful it is to others. 
+    But if it's included: the search terms and facet fields selection could
+    easily added as 2 extra columns with checkboxes.
+    
+  - If there is a merge, I'm not sure where the template code generator would go.
+    It's specific to one display style, so it won't be appropriate on the main
+    page. Probably a separate page would be best. The css inclusion could go
+    on the same page. The RSS settings would need a separate page as well.
+    Probably best to create child pages instead of sibling pages for that.
+    
+  - I'm wondering if the 'results per page' could be set per (primary) display. A
+    table could take more results than a div based layout for example. This
+    could also be added to the primary display table, maybe? Or would that get
+    too messy?
+    
+
+
+
+
+
+
 Reminders:
 ==========
 
