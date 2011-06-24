@@ -258,24 +258,25 @@ function theme_islandora_solr_custom_table($db_values, $results) {
 /**
  * Theme function for setting the values of the <item> elements for the RSS secondary display.
  *
+ * @tutorial http://feed2.w3.org/docs/rss2.html#hrelementsOfLtitemgt
  * @return variable that holds all values to be rendered into <item> elements
  */
 
-function theme_islandora_solr_custom_rss_item($doc) {
+function theme_islandora_solr_custom_rss_item($doc, $feed) {
 
   // set the variables to be rendered as elements in the <item> element
-  $result['title']       = $doc['dc.title'];
-  $result['link']        = $base_url . '/fedora/repository/' . htmlspecialchars($doc['PID'], ENT_QUOTES, 'utf-8');
+  $result['title'] = $doc['dc.title'];
+  $result['link'] = $base_url . '/fedora/repository/' . htmlspecialchars($doc['PID'], ENT_QUOTES, 'utf-8');
   $result['description'] = $doc['dc.description'];
-  $result['items']       = array(
-                             array('key' => 'author', 'value' => $doc['dc.creator']),
-                             array('key' => 'guid', 'value' => $doc['PID'], 'attributes' => array('isPermaLink' => 'false',)),   // <guid isPermaLink="true">http://inessential.com/2002/09/01.php#a2</guid>
-                             array('key' => 'enclosure', 'value' => '', 'attributes' => array('url' => 'http://upload.wikimedia.org/wikipedia/commons/7/7a/Basketball.png', 'length' => '1234', 'type' => 'image/png')), // enclosure     Describes a media object that is attached to the item. More. <enclosure url="http://live.curry.com/mp3/celebritySCms.mp3" length="1069871" type="audio/mpeg"/>
-                             array('key' => 'pubDate', 'value' => $doc['fgs.createdDate']),
-                             array('key' => 'category', 'value' => $doc['dc.subject']),
-                             array('key' => 'comments', 'value' => ''),
-                             array('key' => 'source', 'value' => ''),
-                           ); 
+  $result['items'] = array(
+                       array('key' => 'author', 'value' => $doc['dc.creator']),
+                       array('key' => 'guid', 'value' => $doc['PID'], 'attributes' => array('isPermaLink' => 'false',)),
+                       array('key' => 'pubDate', 'value' => $doc['fgs.createdDate']),
+                       array('key' => 'category', 'value' => $doc['dc.subject']),                             
+                       array('key' => 'enclosure', 'value' => '', 'attributes' => array('url' => '', 'length' => '', 'type' => '')),
+                       array('key' => 'comments', 'value' => ''),
+                       array('key' => 'source', 'value' => ''),
+                     ); 
 return $result;
 }
 
@@ -284,10 +285,11 @@ return $result;
 /**
  * Theme function for setting the values of the <channel> elements for the RSS secondary display.
  *
+ * @tutorial http://feed2.w3.org/docs/rss2.html#requiredChannelElements
  * @return variable that holds all values to be rendered into <channel> elements
  */
 
-function theme_islandora_solr_custom_rss_channel($query) {
+function theme_islandora_solr_custom_rss_channel($query, $feed) {
   global $base_url;
 
   // set the variables to be rendered as elements in the <channel> element

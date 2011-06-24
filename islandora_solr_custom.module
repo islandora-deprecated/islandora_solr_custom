@@ -96,12 +96,12 @@ function islandora_solr_custom_theme() {
     'islandora_solr_custom_rss_item' => array(
       'path' => $path,
       'file' => $file,
-      'arguments' => array('doc' => NULL),
+      'arguments' => array('doc' => NULL, 'feed' => NULL),
     ),
     'islandora_solr_custom_rss_channel' => array(
       'path' => $path,
       'file' => $file,
-      'arguments' => array('query' => NULL),
+      'arguments' => array('query' => NULL, 'feed' => NULL),
     ),
   );
 }

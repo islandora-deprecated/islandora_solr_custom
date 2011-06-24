@@ -98,8 +98,12 @@ class IslandoraSolrResultsRSS extends IslandoraSolrResults {
     $limit = $_GET['limit'];
   }
   $docs = array_slice($docs, 0, $limit);
+
+  $feed = '';
+  if (isset($_GET['feed'])) {
+    $feed = $_GET['feed'];
+  }
   
-  //for ($i = 0; $i < $limit; $i++) {
   // render the single rss <item> elements
   foreach ($docs as $key => $doc) {
   
@@ -112,12 +116,12 @@ class IslandoraSolrResultsRSS extends IslandoraSolrResults {
     }
     
     // all the variables for the <item> elements are set in this theme function.
-    $result = theme('islandora_solr_custom_rss_item', $doc);
+    $result = theme('islandora_solr_custom_rss_item', $doc, $feed);
     
     $item[] = $result;
     
   }
- // } 
+ 
 
   $items = '';
   foreach ($item as $feed) {
@@ -128,7 +132,7 @@ class IslandoraSolrResultsRSS extends IslandoraSolrResults {
   $query = $solrQueryProcessor->solrQuery;
   
   // get the variables for the <channel> element
-  $channel = theme('islandora_solr_custom_rss_channel', $query);
+  $channel = theme('islandora_solr_custom_rss_channel', $query, $feed);
   
   // give the results clean variable names.
   $title = $channel['title'];

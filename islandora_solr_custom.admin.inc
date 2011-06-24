@@ -145,7 +145,8 @@ function islandora_solr_custom_admin_settings() {
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
     '#tree' => TRUE, // this attribute is important to return the submitted values in a deeper nested arrays in $form_state['values'] . See http://drupal.org/node/751826
-    '#description' => t('Configure the RSS settings.'),
+    '#description' => '<p>' . t('You can set a default limit on items in your RSS feed by setting a default in the field below. Additionally, you can force a limit on rss results simply by adding a limit argument to the rss url. For example if you want to limit your items to 15 add this argument to your RSS url: <strong>&limit=15</strong>') . '</p>' .
+                      '<p>' . t('The variables for the values of the RSS items and channel are set in theme functions. You can overwrite these functions in the theme layer and add an additional argument in the theme layer to set conditions in the function based on the value of the argument. For example: if you use <strong>&feed=myrss</strong> in the RSS url, then \'myrss\' will become available in the $feed variable in the theme functions, which you can use in a conditional statement to modify the variables.') . '</p>',
     '#weight' => -3,
   );
   $form['rss']['default_limit'] = array(
