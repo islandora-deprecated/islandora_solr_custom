@@ -62,7 +62,15 @@ provide this interface and I've worked lots with it. It's not too bad.
     
 
 
+aggregator patch:
+=================
 
+To insert rss feeds into views you can use the core aggregator or the feeds module.
+If you use the core aggregator you can render the rss elements into views fields.
+To get the GUID element in a field which contains the PID, views 6.x-2.12 needs
+a patch: http://drupal.org/node/848506 This will be added into 6.x-2.13, but
+that will take a while before it's out.
+Once you get the PID, you can theme almost every media element of the object.
 
 
 
