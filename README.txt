@@ -72,7 +72,8 @@ a patch: http://drupal.org/node/848506 This will be added into 6.x-2.13, but
 that will take a while before it's out.
 Once you get the PID, you can theme almost every media element of the object.
 
-
+In addition to that the Item ID patch may come in handy too.
+http://drupal.org/node/848506
 
 Reminders:
 ==========
