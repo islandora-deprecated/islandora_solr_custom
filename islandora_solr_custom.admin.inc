@@ -498,7 +498,15 @@ function _islandora_solr_custom_solrconfig() {
 
   // xpath experiment
   $xml_doc = new DOMDocument();
-  $xml_file = 'http://' . variable_get('islandora_solr_search_block_url', 'localhost:8080/solr') . '/admin/file/?file=solrconfig.xml';
+ 
+  // check if url has http://
+  $block_url = variable_get('islandora_solr_search_block_url', 'localhost:8080/solr');
+  $pos = strpos($block_url, 'http://');
+  if ($pos === FALSE) {
+    $block_url = 'http://' . $block_url;
+  }
+  
+  $xml_file = $block_url . '/admin/file/?file=solrconfig.xml';
   $xml_doc->load($xml_file, LIBXML_NOCDATA);
   $xpath = new DOMXPath($xml_doc);
 
