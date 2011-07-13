@@ -1,3 +1,11 @@
+////////////////////////////////Important!/////////////////////////////////////
+This module is an addon module for the islandora_solr_search module. There are
+various versions of islandora_solr_search module around, but it's important to
+use the latest stable version.
+You can find it here: https://github.com/Islandora/islandora_solr_search
+///////////////////////////////////////////////////////////////////////////////
+
+
 The islandora_solr_custom module provides a display type for the islandora_solr_search module.
 It automatically looks for the fields set for display in solrconfig.xml and
 outputs the fields in the order that they are defined in the requestHandler.
