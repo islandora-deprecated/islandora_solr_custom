@@ -68,6 +68,9 @@ provide this interface and I've worked lots with it. It's not too bad.
     too messy? It could also go on a settings page for that display where it
     can overwrite the default.
     
+  - Having a search display that has customized output using a template file is
+    great, but I need to find a way to create multiple displays using custom
+    template files. How would I do that?
 
 
 aggregator patch:
