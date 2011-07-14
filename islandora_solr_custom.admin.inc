@@ -406,48 +406,53 @@ function _islandora_solr_custom_db_values($check = FALSE) {
   // set $item variable
   $item = array();
   
-  // on admin page, get DB info and update (add/delete/position) according to solrconfig.xml
+  // on admin page, get DB info and update (add/delete/position) according to solrconfig.xml or admin/luke
   if ($check == TRUE) {
   
     // retrieve all information from the DB table and output them in the order as defined in solrconfig.xml
     $item = array();
     $solrconfig = _islandora_solr_custom_solrconfig();
-    $pos_count = 0;
-    foreach ( $solrconfig as $field) {
-      $res = db_query("SELECT * FROM {islandora_solr_custom} WHERE field = '%s'", $field);
-      $row_result = db_fetch_array($res);
+    // $solrconfig returns FALSE when it couldn't connect to solr at all, so we won't update the DB with an empty value. We'll keep it as it is.
+    if ($solrconfig != FALSE) {
     
-      // if the field is not in the DB, add it using default settings and fetch it again.
-      if (!is_array($row_result)) {
-        // add it to the DB
-        db_query("INSERT INTO {islandora_solr_custom} (field, label, exclude_label, markup) VALUES('%s', '%s', %d, %d)", $field, $field, 0, 1);
-        // and fetch it again
+      $pos_count = 0;
+      foreach ( $solrconfig as $field) {
         $res = db_query("SELECT * FROM {islandora_solr_custom} WHERE field = '%s'", $field);
         $row_result = db_fetch_array($res);
-        $row_result['new'] = TRUE; // if the row just got added now, add a 'new' value. This will be put in a hidden field. This is needed so when saving table results while there are new fields added, the results will be saved, but no values would be set yet. This would override the default values set in this function with empty values.
+    
+        // if the field is not in the DB, add it using default settings and fetch it again.
+        if (!is_array($row_result)) {
+          // add it to the DB
+          db_query("INSERT INTO {islandora_solr_custom} (field, label, exclude_label, markup) VALUES('%s', '%s', %d, %d)", $field, $field, 0, 1);
+          // and fetch it again
+          $res = db_query("SELECT * FROM {islandora_solr_custom} WHERE field = '%s'", $field);
+          $row_result = db_fetch_array($res);
+          $row_result['new'] = TRUE; // if the row just got added now, add a 'new' value. This will be put in a hidden field. This is needed so when saving table results while there are new fields added, the results will be saved, but no values would be set yet. This would override the default values set in this function with empty values.
+        }
+    
+        // update the order of the fields in the DB.
+        db_query("UPDATE {islandora_solr_custom} SET position = %d WHERE field = '%s'", $pos_count, $field);
+        $pos_count++;
+    
+        // save in array
+        $item[] = $row_result;
+    
       }
-    
-      // update the order of the fields in the DB.
-      db_query("UPDATE {islandora_solr_custom} SET position = %d WHERE field = '%s'", $pos_count, $field);
-      $pos_count++;
-    
-      // save in array
-      $item[] = $row_result;
-    
-    }
    
-    // clean up rows that are not in the $solrconfig results
-    $res = db_query("SELECT * FROM {islandora_solr_custom}");
-    while ($db_array = db_fetch_array($res)) {
-      if (!in_array($db_array['field'], $solrconfig)) {
+      // clean up rows that are not in the $solrconfig results
+      $res = db_query("SELECT * FROM {islandora_solr_custom}");
+      while ($db_array = db_fetch_array($res)) {
+        if (!in_array($db_array['field'], $solrconfig)) {
 
-        $field = $db_array['field'];
-        db_query("DELETE FROM {islandora_solr_custom} WHERE field = '%s'", $field);
-        drupal_set_message( t("@field is not defined in solrconfig.xml and is removed.", array('@field' => $field)) );
+          $field = $db_array['field'];
+          db_query("DELETE FROM {islandora_solr_custom} WHERE field = '%s'", $field);
+          drupal_set_message( t("@field is not defined in solrconfig.xml and is removed.", array('@field' => $field)) );
+        }
       }
     }
   }
-  else {
+  
+  if ($check == FALSE OR $solrconfig == FALSE) {
     // just get the data from the DB on normal search requests.
     
     // This selects all rows in the order of the database:
@@ -488,6 +493,9 @@ function _islandora_solr_custom_solrconfig() {
   // if $debug is set to TRUE, then it just makes a quick dummy result array instead of looking for solrconfig.xml.
   $debug = _islandora_solr_custom_debug();
   
+  // set error variable
+  $error = FALSE;
+  
   // setup a variable for debugging. I probably should remove this stuff later.
   if ($debug == TRUE) {
   
@@ -500,45 +508,86 @@ function _islandora_solr_custom_solrconfig() {
     $xml_doc = new DOMDocument();
  
     // check if url has http://
-    $block_url = variable_get('islandora_solr_search_block_url', 'localhost:8080/solr');
-    $pos = strpos($block_url, 'http://');
-    if ($pos === FALSE) {
-      $block_url = 'http://' . $block_url;
+    $solr_url = variable_get('islandora_solr_search_block_url', 'localhost:8080/solr');
+    $http_pos = strpos($solr_url, 'http://');
+    if ($http_pos === FALSE) {
+      $solr_url = 'http://' . $solr_url;
     }
   
-    $xml_file = $block_url . '/admin/file/?file=solrconfig.xml';
-    $xml_doc->load($xml_file, LIBXML_NOCDATA);
-    $xpath = new DOMXPath($xml_doc);
-
-    // xPath query.
-    // variable wich states which requestHandler we're dealing with.
-    $request_handler_variable = variable_get('islandora_solr_search_block_request_handler', t('standard'));
-    $query = '//requestHandler[@name="' . $request_handler_variable . '"]//str[@name="fl"]';
-
-    $entries = $xpath->query($query);
-  
-    $result = '';
-    foreach ($entries as $entry) {
-      $result .= "{$entry->nodeValue}";
+    $xml_file = $solr_url . '/admin/file/?file=solrconfig.xml';
+    if ($xml_doc->load($xml_file, LIBXML_NOCDATA) ) {
+      $xml_doc->load($xml_file, LIBXML_NOCDATA);
     }
-  
-    // set error message if impossible to connect.
-    if ($result == '') {
+    else {
+      // set error message if impossible to connect.
+      $error = TRUE;
       drupal_set_message( t('Failed to connect to @string. Please check your <a href="@link">solr settings</a>.' , array('@string' => $xml_file, '@link' => 'admin/settings/islandora_solr_search')), 'error' );
-      $result = FALSE;
     }
+    // if we have an error skip everything. (not sure if this is the right way of handling this)
+    if ($error == FALSE) {
+      $xpath = new DOMXPath($xml_doc);
+    
+      // xPath query.
+      // variable wich states which requestHandler we're dealing with.
+      $request_handler_variable = variable_get('islandora_solr_search_block_request_handler', t('standard'));
+      $query = '//requestHandler[@name="' . $request_handler_variable . '"]//str[@name="fl"]';
+
+      $entries = $xpath->query($query);
   
-    // exploding $result into an array
-    if ($result != FALSE) {
-      // create array of string.
-      $result = explode(',', $result);
+      $result = '';
+      foreach ($entries as $entry) {
+        $result .= "{$entry->nodeValue}";
+      }
+    
+      // set $solr_config_result
+      $solr_config_result = TRUE;
+      // when there is no result or * is defined, when we have an invalid result.
+      if ($result == '' OR trim($result) == '*' ) {
+        $solr_config_result = FALSE;
       
-      // call function for every array value to trim strings (using an anonymous function call).
-      array_walk($result, create_function('&$value', '$value = trim($value);')); 
+      }
+      //dsm($solr_config_result);
+      // first fallback: check for solr/admin/luke, which contains all solr fields.
+      if ($solr_config_result == FALSE) {
+      
+        $xml_file = $solr_url . '/admin/luke';
+        $xml_doc->load($xml_file, LIBXML_NOCDATA);
+        $xpath = new DOMXPath($xml_doc);
+      
+        // xPath query.
+        // variable wich states which requestHandler we're dealing with.
+        $query = '//lst[@name="fields"]/lst';
+
+        $entries = $xpath->query($query);
+      
+        $result = array();
+        foreach ($entries as $entry) {
+          //dsm($entry);
+          $result[] = "{$entry->getAttribute('name')}";
+        }
+        
+      
+      }
+    
+ 
+      // exploding $result into an array if it's not already an array (in case of luke xml)
+      if (!is_array($result)) {
+        // create array of string.
+        $result = explode(',', $result);
+      
+        // call function for every array value to trim strings (using an anonymous function call).
+        array_walk($result, create_function('&$value', '$value = trim($value);')); 
+      }
     }
+    
   }
   
-  return $result;
+  $output = $result;
+  
+  if ($error == TRUE) {
+    $output = FALSE;
+  }
+  return $output;
 
 }
 
