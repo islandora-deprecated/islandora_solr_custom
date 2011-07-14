@@ -496,47 +496,54 @@ function _islandora_solr_custom_solrconfig() {
   } 
   else {
 
-  // xpath experiment
-  $xml_doc = new DOMDocument();
+    // xpath experiment
+    $xml_doc = new DOMDocument();
  
-  // check if url has http://
-  $block_url = variable_get('islandora_solr_search_block_url', 'localhost:8080/solr');
-  $pos = strpos($block_url, 'http://');
-  if ($pos === FALSE) {
-    $block_url = 'http://' . $block_url;
-  }
+    // check if url has http://
+    $block_url = variable_get('islandora_solr_search_block_url', 'localhost:8080/solr');
+    $pos = strpos($block_url, 'http://');
+    if ($pos === FALSE) {
+      $block_url = 'http://' . $block_url;
+    }
   
-  $xml_file = $block_url . '/admin/file/?file=solrconfig.xml';
-  $xml_doc->load($xml_file, LIBXML_NOCDATA);
-  $xpath = new DOMXPath($xml_doc);
+    $xml_file = $block_url . '/admin/file/?file=solrconfig.xml';
+    $xml_doc->load($xml_file, LIBXML_NOCDATA);
+    $xpath = new DOMXPath($xml_doc);
 
-  // xPath query.
-  // variable wich states which requestHandler we're dealing with.
-  $request_handler_variable = variable_get('islandora_solr_search_block_request_handler', t('standard'));
-  $query = '//requestHandler[@name="' . $request_handler_variable . '"]//str[@name="fl"]';
+    // xPath query.
+    // variable wich states which requestHandler we're dealing with.
+    $request_handler_variable = variable_get('islandora_solr_search_block_request_handler', t('standard'));
+    $query = '//requestHandler[@name="' . $request_handler_variable . '"]//str[@name="fl"]';
 
-  $entries = $xpath->query($query);
+    $entries = $xpath->query($query);
   
-  $result = '';
-  foreach ($entries as $entry) {
-    $result .= "{$entry->nodeValue}";
-  }
+    $result = '';
+    foreach ($entries as $entry) {
+      $result .= "{$entry->nodeValue}";
+    }
   
-  // set error message if impossible to connect.
-  if ($result == '') {
-    drupal_set_message( t('Failed to connect to @string. Please check your <a href="@link">solr settings</a>.' , array('@string' => $xml_file, '@link' => 'admin/settings/islandora_solr_search')), 'error' );
-    $result = FALSE;
-  }
+    // set error message if impossible to connect.
+    if ($result == '') {
+      drupal_set_message( t('Failed to connect to @string. Please check your <a href="@link">solr settings</a>.' , array('@string' => $xml_file, '@link' => 'admin/settings/islandora_solr_search')), 'error' );
+      $result = FALSE;
+    }
   
-  // exploding $result into an array
-  if ($result != FALSE) $result = explode(',', $result);
-  
+    // exploding $result into an array
+    if ($result != FALSE) {
+      // create array of string.
+      $result = explode(',', $result);
+      
+      // call function for every array value to trim strings (using an anonymous function call).
+      array_walk($result, create_function('&$value', '$value = trim($value);')); 
+    }
   }
   
   return $result;
 
 }
 
+      
+      
 /**
  *  Function that looks for all template files that overwrite the module's
  *  islandora-solr-custom.tpl.php.
