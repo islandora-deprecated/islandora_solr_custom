@@ -86,6 +86,11 @@ Once you get the PID, you can theme almost every media element of the object.
 In addition to that the Item ID patch may come in handy too.
 http://drupal.org/node/848506
 
+Unfortunately the Aggregator module does not accept enclosure tags yet. Right
+now this is a feature request for D8. I believe that the Feeds module does know
+how to handle enclosure tags. http://drupal.org/node/16485
+
+
 Reminders:
 ==========
 
