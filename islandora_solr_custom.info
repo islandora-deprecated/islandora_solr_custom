@@ -1,6 +1,6 @@
 name = Islandora Solr Custom Configuration
 description = Configure Islandora Solr Search results using a template file to take full control over the markup.
 dependencies[] = islandora_solr_search
-package = Fedora Repository
-version = 6.1dev
+package = Islandora Search
+version = 6.x-1.x-dev
 core = 6.x
