@@ -14,6 +14,12 @@ solrconfig.xml and the requestHandler. You can quickly customize the output
 style of your search results by changing the settings in the admin section 
 or you can take full control by overriding the template file.
 
+Small TODO's
+============
+
+- make it possible to for the <ol> to count further after browsing through the
+next page instead of start from 1 again.
+
 
 TODO
 ====
