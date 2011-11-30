@@ -617,11 +617,7 @@ function _islandora_solr_custom_template_overwrite() {
     }
     
     $message = '';
-    if (empty($overwritten)) {
-      $message .= t('islandora-solr-custom.tpl.php has not been overwritten yet.');
-    }
-    else {
-      $message .= t('islandora-solr-custom.tpl.php has been overwritten in the following location(s):');
+    if (!empty($overwritten)) {
       foreach ($overwritten as $theme) {
         $row['name'] = $theme['name'];
         $row['path'] = $theme['path'] . '/islandora-solr-custom.tpl.php';

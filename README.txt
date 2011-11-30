@@ -17,9 +17,8 @@ or you can take full control by overriding the template file.
 Small TODO's
 ============
 
-- make it possible to for the <ol> to count further after browsing through the
-next page instead of start from 1 again.
-
+- Don't immediately update the solr field table, instead give a warning instead that changes occurred + a button to
+re-populate the table. When for example it couldn't connect to solr, it removes the entire DB table.
 
 TODO
 ====
