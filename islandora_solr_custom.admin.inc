@@ -521,7 +521,7 @@ function _islandora_solr_custom_solrconfig() {
     else {
       // set error message if impossible to connect.
       $error = TRUE;
-      drupal_set_message( t('Failed to connect to @string. Please check your <a href="@link">solr settings</a>.' , array('@string' => $xml_file, '@link' => 'admin/settings/islandora_solr_search')), 'error' );
+      drupal_set_message( t('Failed to connect to @string. Please check your <a href="@link">solr settings</a>.' , array('@string' => $xml_file, '@link' => '/admin/settings/islandora_solr_search')), 'error' );
     }
     // if we have an error skip everything. (not sure if this is the right way of handling this)
     if ($error == FALSE) {
