@@ -12,3 +12,18 @@
 {
   margin-top: 0px;
 }
+
+.islandora_solr_custom_add
+{
+  color: green;
+}
+
+.islandora_solr_custom_remove
+{
+  color: red;
+}
+
+#islandora-solr-custom-admin-settings div.messages
+{
+  padding: 15px;
+}
