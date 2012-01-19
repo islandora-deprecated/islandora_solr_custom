@@ -5,6 +5,7 @@ use the latest stable version.
 You can find it here: https://github.com/Islandora/islandora_solr_search
 ///////////////////////////////////////////////////////////////////////////////
 
+RSS icon taken from: http://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/18px-Feed-icon.svg.png
 
 The islandora_solr_custom module provides a display type for the islandora_solr_search module.
 It automatically looks for the fields set for display in solrconfig.xml and
