@@ -122,6 +122,7 @@ function islandora_solr_custom_islandora_solr_primary_display() {
     //   'class' => 'ClassName',
     //   'function' => 'function_name',
     //   'description' => 'A description of the display profile',
+    //   'configuration' => 'path/to/configuration/page',
     // );
     'custom' => array(
       'name' => t('Custom'),
@@ -130,6 +131,7 @@ function islandora_solr_custom_islandora_solr_primary_display() {
       'class' => "IslandoraSolrResultsCustom",
       'function' => "displayResults",
       'description' => t("Take full controll over the markup of the Solr results."),
+      'configuration' => 'admin/settings/islandora_solr_search/custom',
     ),
   );
 }
