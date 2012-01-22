@@ -130,7 +130,7 @@ function islandora_solr_custom_islandora_solr_primary_display() {
       'file' => '/includes/IslandoraSolrResultsCustom.inc',
       'class' => "IslandoraSolrResultsCustom",
       'function' => "displayResults",
-      'description' => t("Take full controll over the markup of the Solr results."),
+      'description' => t("Take full control over the markup of the Solr results."),
       'configuration' => 'admin/settings/islandora_solr_search/custom',
     ),
   );

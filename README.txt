@@ -18,7 +18,9 @@ or you can take full control by overriding the template file.
 Small TODO's
 ============
 
-- Reset the form doesn't do anything yet. Oops. Fix this.
+@TODO: Reset the form doesn't do anything yet. Oops. Fix this.
+@TODO: the entire table also gets saved into a variable. I'm going to have to prevent this.
+
 
 TODO
 ====
