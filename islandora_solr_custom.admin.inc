@@ -397,16 +397,22 @@ function _islandora_solr_custom_markup_div($markup) {
  * Islandora solr search results template
  *
  * Variables available:
- * - $variables: all array elements of $variables can be used as a variable. e.g. $base_url equals $variables[\'base_url\']
+ * - $variables: all array elements of $variables can be used as a variable.
+ *   e.g. $base_url equals $variables[\'base_url\']
  * - $base_url: The base url of the current website. eg: http://example.com .
  * - $user: The user object.
  *
- * - $style: the style of the display (\'div\' or \'table\'). Set in admin page by default. Overridden by the query value: ?display=foo
+ * - $style: the style of the display (\'div\' or \'table\'). Set in admin page
+ *   by default. Overridden by the query value: ?display=foo
  * - $results: the array containing the solr search results
- * - $table_rendered: If the display style is set to \'table\', this will contain the rendered table.
- *    For theme overriding, see: theme_islandora_solr_custom_table() 
+ * - $table_rendered: If the display style is set to \'table\', this will
+ *   contain the rendered table.
+ *   For theme overriding, see: theme_islandora_solr_custom_table() 
  * - $switch_rendered: The rendered switch to toggle between display styles
  *    For theme overriding, see: theme_islandora_solr_custom_switch() 
+ *
+ * - Important! Replace the solr field names in the t() functions with
+ *   human readable names.
  *
  */
 ?>
@@ -425,7 +431,7 @@ function _islandora_solr_custom_markup_div($markup) {
   foreach ($markup as $field) {
 
     $output .= '  <div class="solr-field <?php print $result[\'' . $field . '\'][\'class\']; ?>">
-      <div class="label"><label><?php print t($result[\'' . $field . '\'][\'label\']); ?></label></div>
+      <div class="label"><label><?php print t(\'' . $field . '\'); ?></label></div>
       <div class="value"><?php print $result[\'' . $field . '\'][\'value\']; ?></div>
     </div>
   ';
