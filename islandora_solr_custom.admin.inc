@@ -78,6 +78,29 @@ function islandora_solr_custom_admin_settings() {
     '#weight' => -1,
   );
 
+  
+  
+  
+  // form: General settings
+  $form['general_settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('General settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#tree' => TRUE, // this attribute is important to return the submitted values in a deeper nested arrays in $form_state['values'] . See http://drupal.org/node/751826
+    '#weight' => -6,
+  );
+  $form['general_settings']['human_readable_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Human readable name'),
+    '#default_value' => variable_get('islandora_solr_custom_human_readable_name', t('Custom')),
+    '#description' => t('Set the user readable name for this display'),
+    '#weight' => -10,
+  );
+
+
+  
+  
 
 
 
@@ -296,6 +319,9 @@ function islandora_solr_custom_settings_form_submit($form, &$form_state) {
       // drupal_write_record("islandora_solr_custom, &$field, $update = array());
     }
   }
+
+  // saving the style result
+  variable_set('islandora_solr_custom_human_readable_name', $form_state['values']['general_settings']['human_readable_name']);
 
   // saving the style result
   variable_set('islandora_solr_custom_display', $form_state['values']['display_style']['display']);
