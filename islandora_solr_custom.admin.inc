@@ -645,7 +645,7 @@ function _islandora_solr_custom_solrconfig() {
       // set $solr_config_result
       $solr_config_result = TRUE;
       // when there is no result or * is defined, when we have an invalid result.
-      if ($result == '' OR trim($result) == '*' ) {
+      if ($result == '' OR trim($result) == '*' OR trim($result) == '* score') {
         $solr_config_result = FALSE;
 
       }
