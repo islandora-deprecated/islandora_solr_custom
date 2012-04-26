@@ -278,7 +278,7 @@ function islandora_solr_custom_admin_settings_validate($element, &$form_state) {
 
   //dsm($element);
   if (!is_numeric($element['rss']['default_limit']['#value'])) {
-    form_error(&$element['rss']['default_limit'], t('Default RSS limit must be a numeric value.'));
+    form_error($element['rss']['default_limit'], t('Default RSS limit must be a numeric value.'));
   }
 
   //drupal_set_message(form_get_errors());
@@ -645,7 +645,7 @@ function _islandora_solr_custom_solrconfig() {
       // set $solr_config_result
       $solr_config_result = TRUE;
       // when there is no result or * is defined, when we have an invalid result.
-      if ($result == '' OR trim($result) == '*' ) {
+      if ($result == '' OR trim($result) == '*' OR trim($result) == '* score') {
         $solr_config_result = FALSE;
 
       }
