@@ -29,13 +29,16 @@ function islandora_solr_custom_uninstall() {
     'islandora_solr_custom_style',
     'islandora_solr_custom_switch',
     'islandora_solr_custom_table',
+    'islandora_solr_custom_human_readable_name',
+    'islandora_solr_custom_rss_limit',
+    'islandora_solr_custom_updates',
   );
   foreach ($variables as $variable) {
     variable_del($variable);
   }
 
   
-  
+	
 }
 
 /**
