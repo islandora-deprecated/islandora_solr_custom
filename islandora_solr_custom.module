@@ -122,14 +122,16 @@ function islandora_solr_custom_islandora_solr_primary_display() {
     //   'class' => 'ClassName',
     //   'function' => 'function_name',
     //   'description' => 'A description of the display profile',
+    //   'configuration' => 'path/to/configuration/page',
     // );
     'custom' => array(
-      'name' => t('Custom'),
+      'name' => variable_get('islandora_solr_custom_human_readable_name', t('Custom')),
       'module' => 'islandora_solr_custom',
       'file' => '/includes/IslandoraSolrResultsCustom.inc',
       'class' => "IslandoraSolrResultsCustom",
       'function' => "displayResults",
-      'description' => t("Take full controll over the markup of the Solr results."),
+      'description' => t("Take full control over the markup of the Solr results."),
+      'configuration' => 'admin/settings/islandora_solr_search/custom',
     ),
   );
 }
@@ -139,6 +141,9 @@ function islandora_solr_custom_islandora_solr_primary_display() {
  * Implements hook_islandora_solr_secondary_display()
  */
 function islandora_solr_custom_islandora_solr_secondary_display() {
+  // set path
+  global $base_path;
+  $path = $base_path . drupal_get_path('module', 'islandora_solr_custom');
   return array(
     'csv_custom' => array(
       'name' => t('CSV custom'),
@@ -147,7 +152,7 @@ function islandora_solr_custom_islandora_solr_secondary_display() {
       'class' => 'IslandoraSolrResultsCSVcustom',
       'function' => 'printCSV',
       'description' => 'Download complete resultset as a CSV Spreadsheet',
-      'logo' => '<img src="http://www.stdicon.com/crystal/application/vnd.ms-excel?size=32" class="islandora_solr_secondary_display_icon">',
+      'logo' => '<img src="' . $path . '/images/csv.png" class="islandora_solr_secondary_display_icon">',
     ),
     'rss' => array(
       'name' => t('RSS'),
@@ -156,7 +161,7 @@ function islandora_solr_custom_islandora_solr_secondary_display() {
       'class' => 'IslandoraSolrResultsRSS',
       'function' => 'printRSS',
       'description' => 'Parse a complete resultset as an RSS feed',
-      'logo' => '<img src="http://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/18px-Feed-icon.svg.png" class="islandora_solr_secondary_display_icon">',
+      'logo' => '<img src="' . $path . '/images/rss.png" class="islandora_solr_secondary_display_icon">',
     ),
   );
 }

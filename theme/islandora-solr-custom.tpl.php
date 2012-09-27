@@ -23,7 +23,7 @@
 
 <?php if ($style == 'div'): ?>
 
-  <ul class="islandora_solr_results">
+  <ol class="islandora_solr_results" start="<?php print $record_start; ?>">
     <?php if ($results == ''): print '<p>' . t('Your search yielded no results') . '</p>'; ?>
     <?php else: ?>
     <?php foreach ($results as $id => $result): ?>
@@ -53,7 +53,7 @@
       </li>
     <?php endforeach; ?>
     <?php endif; ?>
-  </ul>
+  </ol>
 
 <?php elseif ($style == 'table'): ?>
 
