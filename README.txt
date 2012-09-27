@@ -5,6 +5,7 @@ use the latest stable version.
 You can find it here: https://github.com/Islandora/islandora_solr_search
 ///////////////////////////////////////////////////////////////////////////////
 
+RSS icon taken from: http://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Feed-icon.svg/18px-Feed-icon.svg.png
 
 The islandora_solr_custom module provides a display type for the islandora_solr_search module.
 It automatically looks for the fields set for display in solrconfig.xml and
@@ -13,6 +14,12 @@ Islandora_solr_custom will look at the settings of islandora_solr_search to find
 solrconfig.xml and the requestHandler. You can quickly customize the output 
 style of your search results by changing the settings in the admin section 
 or you can take full control by overriding the template file.
+
+Small TODO's
+============
+
+@TODO: Reset the form doesn't do anything yet. Oops. Fix this.
+@TODO: the entire table also gets saved into a variable. I'm going to have to prevent this.
 
 
 TODO

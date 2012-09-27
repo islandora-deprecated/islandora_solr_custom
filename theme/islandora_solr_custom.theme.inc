@@ -73,6 +73,7 @@ function islandora_solr_custom_preprocess_islandora_solr_custom(&$variables) {
   $variables['switch'] = variable_get('islandora_solr_custom_switch', 0);
   $variables['switch_rendered'] = ''; // set the variable. If the display switch is enabled, this variable will be populated with a rendered link.
   $variables['css'] = variable_get('islandora_solr_custom_css', 1);
+  $variables['record_start'] = $variables['results_raw']->response->start + 1; // add one because we don't want to start from 0
 
   // set $variables['style'];
   $variables['style'] = '';
